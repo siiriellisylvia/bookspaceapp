@@ -1,8 +1,12 @@
 import { Link } from "react-router";
 import BookCard from "../components/BookCard";
 import Book, { type BookType } from "../models/Book";
+import { authenticateUser } from "../services/auth.server";
+import type { Route } from "./+types/books";
 
-export async function loader() {
+export async function loader({ request }: Route.LoaderArgs) {
+  await authenticateUser(request);
+
   const books = await Book.find().lean();
   return Response.json({ books });
 }
