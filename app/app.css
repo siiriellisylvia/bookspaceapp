@@ -2,15 +2,59 @@
 
 @theme {
   --font-sans:
-    "Inter", ui-sans-serif, system-ui, sans-serif, "Apple Color Emoji",
+    "Open Sans", ui-sans-serif, system-ui, sans-serif, "Apple Color Emoji",
     "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
+  --font-heading:
+    "Playfair Display", ui-serif, Georgia, Cambria, "Times New Roman", Times,
+    serif;
+  --color-primary-blue: #47596f;
+  --color-primary-burgundy: #48302d;
+  --color-primary-dark: #1C1717;
+  --color-primary-beige: #d8ccbb;
+  --color-primary-off-white:#F4F2F0;
+  --color-primary-beige-80: rgb(216, 204, 187, 0.8);
+  --color-black: #101010;
+  --color-white: #f4f2f0;
 }
 
 html,
 body {
-  @apply bg-white dark:bg-gray-950;
+  @apply bg-primary-off-white dark:bg-primary-dark m-0 p-0 font-sans text-primary-dark dark:text-primary-beige;
 
   @media (prefers-color-scheme: dark) {
     color-scheme: dark;
   }
+}
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+  @apply font-heading font-bold;
+}
+
+h1 {
+  @apply text-2xl lg:text-4xl;
+}
+
+h2 {
+  @apply text-xl lg:text-3xl;
+}
+
+h3 {
+  @apply text-lg lg:text-2xl;
+}
+
+h4 {
+  @apply text-base lg:text-xl;
+}
+
+h5 {
+  @apply text-base;
+}
+
+p {
+  @apply text-base dark:text-primary-beige;
 }
