@@ -26,19 +26,43 @@ export async function loader({ request }: Route.LoaderArgs) {
 
   const books = await Book.find(query).lean();
 
-  return Response.json({ books });
+  // Get top 10 genres
+  const genreStats = await Book.aggregate([
+    { $unwind: "$genres" },
+    { $group: { _id: "$genres", count: { $sum: 1 } } },
+    { $sort: { count: -1 } },
+    { $limit: 10 },
+  ]);
+
+  const popularGenres = genreStats.map((g) => g._id);
+
+  return Response.json({ books, popularGenres });
 }
 
 export default function BooksPage({
   loaderData,
 }: {
-  loaderData: { books: BookType[] };
+  loaderData: { books: BookType[]; popularGenres: string[] };
 }) {
-  const { books } = loaderData;
+  const { books, popularGenres } = loaderData;
   const [searchParams, setSearchParams] = useSearchParams();
 
   const search = searchParams.get("search") || "";
   const selectedGenres = searchParams.getAll("genre"); // Get all selected genres
+
+  // update search params when a genre is toggled
+  const toggleGenre = (genre: string) => {
+    const newParams = new URLSearchParams(searchParams);
+    const genres = newParams.getAll("genre");
+
+    if (genres.includes(genre)) {
+      newParams.delete("genre", genre); // Remove if already selected
+    } else {
+      newParams.append("genre", genre); // Add if not selected
+    }
+
+    setSearchParams(newParams);
+  };
 
   return (
     <section className="flex flex-col mx-auto px-2 lg:px-40 py-2 lg:py-10">
@@ -55,6 +79,19 @@ export default function BooksPage({
             setSearchParams(newParams);
           }}
         />
+
+        {/* genre toggles */}
+        <div className="flex flex-wrap gap-2 mb-4">
+          {popularGenres.map((genre) => (
+            <Button
+              key={genre}
+              variant={selectedGenres.includes(genre) ? "default" : "outline"}
+              onClick={() => toggleGenre(genre)}
+            >
+              {genre}
+            </Button>
+          ))}
+        </div>
       </div>
 
       {/* books */}
