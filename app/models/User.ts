@@ -1,16 +1,16 @@
-import mongoose, { Schema, model, type InferSchemaType } from "mongoose";
+import mongoose, { Schema, Types, model, type InferSchemaType } from "mongoose";
 import bcrypt from "bcryptjs";
 
 // Define User schema
 const userSchema = new Schema(
   {
     image: { type: String }, // Optional user profile image
-    mail: {
+    email: {
       type: String,
       required: [true, "Email is required."],
       unique: true, // Ensures emails are unique
     },
-    name: { type: String, required: [true, "Name is required."] }, // Name is required
+    name: { type: String },
     password: {
       type: String,
       required: [true, "Password is required."],
@@ -19,30 +19,36 @@ const userSchema = new Schema(
     favoriteBooks: [{ type: mongoose.Schema.Types.ObjectId, ref: "Book" }], // References favorite books
     favoriteGenres: { type: [String], default: [] }, // Stores user's favorite genres
     favoriteAuthors: { type: [String], default: [] }, // Stores user's favorite authors
-    ownedBooks: [{ type: mongoose.Schema.Types.ObjectId, ref: "Book" }], // Books the user owns
-    reviews: [
+    bookCollection: [
       {
-        book: {
-          type: mongoose.Schema.Types.ObjectId,
-          ref: "Book",
-          required: true,
-        }, // Reference to reviewed book
-        rating: { type: Number, min: 1, max: 5, required: true }, // Rating between 1-5
-        comment: { type: String }, // Optional review comment
-        createdAt: { type: Date, default: Date.now }, // Auto-generated timestamp
+        bookId: { type: Schema.Types.ObjectId, ref: "Book" },
+        progress: { type: Number, default: 0 },
+        isCurrentlyReading: { type: Boolean, default: false },
+        _id: false, // prevent Mongoose from creating an automatic _id for each entry
       },
     ],
+    readingGoal: {
+      daily: {
+        targetMinutes: Number,
+      },
+    },
   },
   { timestamps: true }, // Adds createdAt & updatedAt fields
 );
 
 // Middleware: Hash password before saving to the database
+// pre save password hook
 userSchema.pre("save", async function (next) {
-  if (!this.isModified("password")) return next(); // Skip if password is unchanged
+  const user = this;
+
+  // only hash the password if it has been modified (or is new)
+  if (!user.isModified("password")) {
+    return next(); // continue
+  }
 
   try {
     const salt = await bcrypt.genSalt(10); // Generate a salt
-    this.password = await bcrypt.hash(this.password, salt); // Hash password
+    user.password = await bcrypt.hash(user.password, salt); // Hash password
     next(); // Continue saving
   } catch (error: any) {
     next(error as mongoose.CallbackError); // Pass error to Mongoose
@@ -51,7 +57,7 @@ userSchema.pre("save", async function (next) {
 
 // Infer TypeScript type for the schema
 export type UserType = InferSchemaType<typeof userSchema> & {
-  _id: mongoose.Types.ObjectId;
+  _id: Types.ObjectId;
 };
 
 // Create and export User model
