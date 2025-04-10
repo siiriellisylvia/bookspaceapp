@@ -65,7 +65,7 @@ export default function Home({
                 key={entry.book._id.toString()}
                 to={`/books/${entry.book._id}`}
               >
-                <BookCard book={entry.book}/>
+                <BookCard book={entry.book} progress={entry.progress} />
               </Link>
             ) : (
               <p key={index} className="text-red-500">
