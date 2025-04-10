@@ -1,9 +1,15 @@
 import type { Route } from "../+types/root";
 import Book, { type BookType } from "../models/Book";
-import { AiOutlineStar, AiOutlineBook } from "react-icons/ai"; // Star & book icons
+import {
+  AiOutlineStar,
+  AiOutlineBook,
+  AiOutlineDown,
+  AiOutlineUp,
+} from "react-icons/ai"; // Star & book icons
 import { FaBookmark } from "react-icons/fa"; // Bookmark icon
 import BookCard from "~/components/BookCard";
 import { getRecommendedBooks } from "~/utils/getRecommendedBooks";
+import { useState } from "react";
 
 // Loader to fetch book data from MongoDB
 export async function loader({ request, params }: Route.LoaderArgs) {
@@ -17,6 +23,17 @@ export async function loader({ request, params }: Route.LoaderArgs) {
   return Response.json({ book, recommendedBooks });
 }
 
+// Helper function to truncate text without breaking words
+function truncateText(text: string, maxChars: number): string {
+  if (text.length <= maxChars) return text;
+  let truncated = text.substring(0, maxChars);
+  const lastSpace = truncated.lastIndexOf(" ");
+  if (lastSpace > 0) {
+    truncated = truncated.substring(0, lastSpace);
+  }
+  return truncated + "...";
+}
+
 // Book Detail Component
 export default function BookDetail({
   loaderData,
@@ -24,6 +41,9 @@ export default function BookDetail({
   loaderData: { book: BookType; recommendedBooks: BookType[] };
 }) {
   const { book, recommendedBooks } = loaderData;
+  const [isDescriptionExpanded, setIsDescriptionExpanded] = useState(false);
+  const maxChars = 250;
+  const truncatedDescription = truncateText(book.description, maxChars);
 
   return (
     <div className="flex flex-col items-center p-4 md:p-10 max-w-3xl mx-auto">
@@ -57,7 +77,29 @@ export default function BookDetail({
 
       <div className="mt-6 w-full">
         <h3 className="text-xl font-semibold">Description</h3>
-        <p className="text-gray-700 mt-2">{book.description}</p>
+        {book.description.length > maxChars ? (
+          <div>
+            <p
+              onClick={() => setIsDescriptionExpanded(!isDescriptionExpanded)}
+              className="mt-2 cursor-pointer hover:text-gray-600"
+            >
+              {isDescriptionExpanded ? book.description : truncatedDescription}
+            </p>
+            <button
+              onClick={() => setIsDescriptionExpanded(!isDescriptionExpanded)}
+              className="flex items-center mt-2 cursor-pointer"
+            >
+              {isDescriptionExpanded ? "Show less" : "Show more"}
+              {isDescriptionExpanded ? (
+                <AiOutlineUp size={16} className="ml-1" />
+              ) : (
+                <AiOutlineDown size={16} className="ml-1" />
+              )}
+            </button>
+          </div>
+        ) : (
+          <p className="mt-2">{book.description}</p>
+        )}
       </div>
 
       <div className="flex flex-col items-center gap-4 mt-6">
