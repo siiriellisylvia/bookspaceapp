@@ -12,13 +12,14 @@ import BookCard from "~/components/BookCard";
 import { getRecommendedBooks } from "~/utils/getRecommendedBooks";
 import { useState } from "react";
 import { redirect, useFetcher } from "react-router";
-import { authenticateUser } from "~/services/auth.server";
+import { getAuthUser } from "~/services/auth.server";
 import { Button } from "~/components/ui/button";
+
 
 // Loader to fetch book data from MongoDB
 export async function loader({ request, params }: Route.LoaderArgs) {
-  const currentUserId = await authenticateUser(request);
-  if (!currentUserId) {
+  const currentUser = await getAuthUser(request);
+  if (!currentUser) {
     throw redirect("/signin");
   }
 
@@ -27,13 +28,9 @@ export async function loader({ request, params }: Route.LoaderArgs) {
     throw new Response("Book Not Found", { status: 404 });
   }
 
-  // Check if the book is in the user's collection
-  const user = await User.findOne({
-    _id: currentUserId._id,
-    "bookCollection.bookId": book._id,
-  });
-
-  const isBookmarked = !!user;
+  const isBookmarked = currentUser.bookCollection.some(
+    (entry) => entry.bookId?.toString() === book._id.toString(),
+  );
 
   const recommendedBooks = await getRecommendedBooks(book);
 
@@ -96,11 +93,11 @@ export default function BookDetail({
           <Button
             type="submit"
             variant="default"
-            className="p-2 hover:bg-white/80"
+            className="p-2 bg-primary-burgundy hover:bg-white/80"
             disabled={fetcher.state !== "idle"}
           >
             {isBookmarked ? (
-              <FaBookmark className="fill-primary-burgundy" size={24} />
+              <FaBookmark className="fill-primary-off-white" size={24} />
             ) : (
               <FaRegBookmark size={24} />
             )}
