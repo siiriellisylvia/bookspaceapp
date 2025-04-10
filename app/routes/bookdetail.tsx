@@ -115,11 +115,13 @@ export default function BookDetail({
       <h1 className="text-2xl md:text-3xl font-bold text-center mt-4">
         {book.title}
       </h1>
-      <h2 className="text-lg text-gray-600">by {book.author.join(", ")}</h2>
+      <h2 className="text-lg dark:text-primary-beige">
+        by {book.author.join(", ")}
+      </h2>
 
-      <div className="flex items-center gap-6 mt-4 text-gray-700">
+      <div className="flex items-center gap-6 mt-4 text-primary-beige">
         <div className="flex items-center gap-1">
-          <AiOutlineStar size={20} className="text-yellow-500" />
+          <AiOutlineStar size={20} className="text-primary-beige" />
           <span className="text-lg">{book.rating.toFixed(1)}</span>
         </div>
         <div className="flex items-center gap-1">
@@ -131,20 +133,15 @@ export default function BookDetail({
           <Button
             type="submit"
             variant="default"
-            className="p-2 bg-primary-burgundy hover:bg-primary-burgundy/80"
             disabled={fetcher.state !== "idle"}
           >
             {isBookmarked ? (
-              <>
-                <FaBookmark className="fill-primary-off-white" size={24} />
-                <p>Bookmarked</p>
-              </>
+              <FaBookmark size={24} />
             ) : (
-              <>
-                <FaRegBookmark size={24} />
-                <p>Bookmark</p>
-              </>
+              <FaRegBookmark size={24} />
             )}
+            {isBookmarked ? "Bookmarked" : "Bookmark"}
+            
           </Button>
         </fetcher.Form>
       </div>
@@ -155,7 +152,7 @@ export default function BookDetail({
           <div>
             <p
               onClick={() => setIsDescriptionExpanded(!isDescriptionExpanded)}
-              className="mt-2 cursor-pointer hover:text-gray-600"
+              className="mt-2 cursor-pointer hover:text-primary-burgundy"
             >
               {isDescriptionExpanded ? book.description : truncatedDescription}
             </p>
