@@ -98,9 +98,7 @@ export default function BooksPage({
       <section className="flex flex-wrap justify-center gap-4">
         {books.length ? (
           books.map((book) => (
-            <Link key={book._id.toString()} to={`/books/${book._id}`}>
               <BookCard book={book} />
-            </Link>
           ))
         ) : (
           <p className="col-span-full text-center">No books found.</p>
