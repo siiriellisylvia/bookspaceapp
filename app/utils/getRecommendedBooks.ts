@@ -1,9 +1,28 @@
 import Book, { type BookType } from "~/models/Book";
 
+// Cache to store recommended books by book ID
+const recommendationsCache = new Map<
+  string,
+  { books: BookType[]; timestamp: number }
+>();
+const CACHE_DURATION = 1000 * 60 * 60; // 1 hour cache duration
+
 export async function getRecommendedBooks(
   currentBook: BookType,
   limit: number = 3,
 ) {
+  const bookId = currentBook._id.toString();
+  const now = Date.now();
+
+  // Check if we have a valid cache entry
+  const cachedResult = recommendationsCache.get(bookId);
+  if (cachedResult && now - cachedResult.timestamp < CACHE_DURATION) {
+    console.log("Using cached recommendations for book:", bookId);
+    return cachedResult.books;
+  }
+
+  console.log("Calculating new recommendations for book:", bookId);
+
   const recommendedBooks = await Book.aggregate([
     {
       $match: {
@@ -53,5 +72,13 @@ export async function getRecommendedBooks(
     },
   ]);
 
-  return recommendedBooks[0]?.finalBooks || [];
+  const result = recommendedBooks[0]?.finalBooks || [];
+
+  // Cache the result
+  recommendationsCache.set(bookId, {
+    books: result,
+    timestamp: now,
+  });
+
+  return result;
 }
