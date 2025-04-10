@@ -34,7 +34,7 @@ const bookSchema = new Schema(
 
 // Infer TypeScript type for the schema
 export type BookType = InferSchemaType<typeof bookSchema> & {
-  _id: Types.ObjectId;
+  _id: Types.ObjectId | string;
 };
 
 // Create a Mongoose model for the Book schema
