@@ -17,12 +17,8 @@ export async function getRecommendedBooks(
   // Check if we have a valid cache entry
   const cachedResult = recommendationsCache.get(bookId);
   if (cachedResult && now - cachedResult.timestamp < CACHE_DURATION) {
-    console.log("Using cached recommendations for book:", bookId);
     return cachedResult.books;
   }
-
-  console.log("Calculating new recommendations for book:", bookId);
-
   const recommendedBooks = await Book.aggregate([
     {
       $match: {
