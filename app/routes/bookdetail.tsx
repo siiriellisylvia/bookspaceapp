@@ -1,6 +1,6 @@
 import type { Route } from "../+types/root";
 import Book, { type BookType } from "../models/Book";
-import User from "../models/User";
+import type { UserType } from "../models/User";
 import {
   AiOutlineStar,
   AiOutlineBook,
@@ -14,6 +14,8 @@ import { useState } from "react";
 import { redirect, useFetcher } from "react-router";
 import { getAuthUser } from "~/services/auth.server";
 import { Button } from "~/components/ui/button";
+import Review from "~/models/Review";
+import ReviewList from "~/components/review/ReviewList";
 
 // Loader to fetch book data from MongoDB
 export async function loader({ request, params }: Route.LoaderArgs) {
@@ -33,7 +35,34 @@ export async function loader({ request, params }: Route.LoaderArgs) {
 
   const recommendedBooks = await getRecommendedBooks(book);
 
-  return Response.json({ book, recommendedBooks, isBookmarked });
+  const reviews = await Review.find({ book: params.id })
+    .populate("user", "name")
+    .sort({ createdAt: -1 })
+    .lean();
+
+  // If a user is missing, replace `null` with "Deleted User"
+  const processedReviews = reviews.map((review) => ({
+    ...review,
+    user: review.user
+      ? { _id: (review.user as any)._id, name: (review.user as any).name } // keep _id if user exists
+      : { _id: "deleted", name: "Deleted User" }, // provide fallback _id for deleted users
+  }));
+
+  // Check if the auth user has already reviewed the book
+  const userHasReviewed = reviews.some(
+    (review) =>
+      review.user &&
+      (review.user as any)._id.toString() === currentUser._id.toString(),
+  );
+
+  return Response.json({
+    book,
+    recommendedBooks,
+    reviews: processedReviews,
+    userHasReviewed,
+    isBookmarked,
+    currentUser,
+  });
 }
 
 // Helper function to truncate text without breaking words
@@ -55,9 +84,19 @@ export default function BookDetail({
     book: BookType;
     recommendedBooks: BookType[];
     isBookmarked: boolean;
+    reviews: any[];
+    userHasReviewed: boolean;
+    currentUser: UserType;
   };
 }) {
-  const { book, recommendedBooks, isBookmarked } = loaderData;
+  const {
+    book,
+    recommendedBooks,
+    isBookmarked,
+    reviews,
+    userHasReviewed,
+    currentUser,
+  } = loaderData;
   const fetcher = useFetcher();
   const [isDescriptionExpanded, setIsDescriptionExpanded] = useState(false);
   const maxChars = 250;
@@ -96,9 +135,15 @@ export default function BookDetail({
             disabled={fetcher.state !== "idle"}
           >
             {isBookmarked ? (
-              <><FaBookmark className="fill-primary-off-white" size={24} /><p>Bookmarked</p></>
+              <>
+                <FaBookmark className="fill-primary-off-white" size={24} />
+                <p>Bookmarked</p>
+              </>
             ) : (
-              <><FaRegBookmark size={24} /><p>Bookmark</p></>
+              <>
+                <FaRegBookmark size={24} />
+                <p>Bookmark</p>
+              </>
             )}
           </Button>
         </fetcher.Form>
@@ -142,6 +187,12 @@ export default function BookDetail({
             <p className="text-gray-500">No similar books found.</p>
           )}
         </div>
+        <ReviewList
+          reviews={reviews}
+          book={book}
+          userHasReviewed={userHasReviewed}
+          currentUser={currentUser._id.toString()}
+        />
       </div>
     </div>
   );

@@ -12,6 +12,7 @@ export default [
     route("books", "routes/books.tsx"),
     route("books/:id", "routes/bookdetail.tsx"),
     route("books/:id/bookmark", "routes/bookmark.tsx"),
+    route("books/:id/review", "routes/review.tsx"),
   ]),
   route("signup", "routes/signup.tsx"),
   route("signin", "routes/signin.tsx"),
