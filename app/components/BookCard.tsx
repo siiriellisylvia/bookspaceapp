@@ -11,7 +11,6 @@ export default function BookCard({
   const progressPercent =
     progress && book.pageCount ? (progress / book.pageCount) * 100 : 0;
 
-  console.log("BookCard", book, progress);
 
   return (
     <Link to={`/books/${book._id}`}>
