@@ -61,12 +61,7 @@ export default function Home({
         <div className="flex flex-wrap justify-center gap-4">
           {bookCollection.map((entry, index) =>
             entry.book ? (
-              <Link
-                key={entry.book._id.toString()}
-                to={`/books/${entry.book._id}`}
-              >
                 <BookCard book={entry.book} progress={entry.progress} />
-              </Link>
             ) : (
               <p key={index} className="text-red-500">
                 Error: Book not found

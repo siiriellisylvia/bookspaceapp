@@ -1,3 +1,4 @@
+import { Link } from "react-router";
 import type { BookType } from "~/models/Book";
 
 export default function BookCard({
@@ -13,6 +14,7 @@ export default function BookCard({
   console.log("BookCard", book, progress);
 
   return (
+    <Link to={`/books/${book._id}`}>
     <div className="flex flex-col w-30 lg:w-48 text-wrap">
       <img
         src={
@@ -34,5 +36,6 @@ export default function BookCard({
       )}
       <p>{book.title}</p>
     </div>
+    </Link>
   );
 }
