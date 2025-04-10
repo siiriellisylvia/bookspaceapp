@@ -1,6 +1,6 @@
 import { Form, redirect } from "react-router";
 import type { Route } from "../+types/root";
-import User, { type UserType } from "../models/User";
+import { type UserType } from "../models/User";
 import { getAuthUser } from "../services/auth.server";
 import { FaBookmark, FaQuoteLeft, FaBook, FaStar } from "react-icons/fa";
 import { Button } from "../components/ui/button";
@@ -21,9 +21,9 @@ export async function loader({ request }: Route.LoaderArgs) {
   }
   const userBooks = await Book.find({
     _id: { $in: user.bookCollection.map((item) => item.bookId) },
-  }).lean();
+  });
 
-  return { user, userBooks };
+  return Response.json({ user, userBooks });
 }
 
 export default function ProfilePage({
