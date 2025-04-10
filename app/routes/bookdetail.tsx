@@ -15,7 +15,6 @@ import { redirect, useFetcher } from "react-router";
 import { getAuthUser } from "~/services/auth.server";
 import { Button } from "~/components/ui/button";
 
-
 // Loader to fetch book data from MongoDB
 export async function loader({ request, params }: Route.LoaderArgs) {
   const currentUser = await getAuthUser(request);
@@ -93,13 +92,13 @@ export default function BookDetail({
           <Button
             type="submit"
             variant="default"
-            className="p-2 bg-primary-burgundy hover:bg-white/80"
+            className="p-2 bg-primary-burgundy hover:bg-primary-burgundy/80"
             disabled={fetcher.state !== "idle"}
           >
             {isBookmarked ? (
-              <FaBookmark className="fill-primary-off-white" size={24} />
+              <><FaBookmark className="fill-primary-off-white" size={24} /><p>Bookmarked</p></>
             ) : (
-              <FaRegBookmark size={24} />
+              <><FaRegBookmark size={24} /><p>Bookmark</p></>
             )}
           </Button>
         </fetcher.Form>
