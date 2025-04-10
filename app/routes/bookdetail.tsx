@@ -1,26 +1,43 @@
 import type { Route } from "../+types/root";
 import Book, { type BookType } from "../models/Book";
+import User from "../models/User";
 import {
   AiOutlineStar,
   AiOutlineBook,
   AiOutlineDown,
   AiOutlineUp,
 } from "react-icons/ai"; // Star & book icons
-import { FaBookmark } from "react-icons/fa"; // Bookmark icon
+import { FaBookmark, FaRegBookmark } from "react-icons/fa"; // Bookmark icons
 import BookCard from "~/components/BookCard";
 import { getRecommendedBooks } from "~/utils/getRecommendedBooks";
 import { useState } from "react";
+import { redirect, useFetcher } from "react-router";
+import { authenticateUser } from "~/services/auth.server";
+import { Button } from "~/components/ui/button";
 
 // Loader to fetch book data from MongoDB
 export async function loader({ request, params }: Route.LoaderArgs) {
+  const currentUserId = await authenticateUser(request);
+  if (!currentUserId) {
+    throw redirect("/signin");
+  }
+
   const book = await Book.findById(params.id);
   if (!book) {
     throw new Response("Book Not Found", { status: 404 });
   }
 
+  // Check if the book is in the user's collection
+  const user = await User.findOne({
+    _id: currentUserId._id,
+    "bookCollection.bookId": book._id,
+  });
+
+  const isBookmarked = !!user;
+
   const recommendedBooks = await getRecommendedBooks(book);
 
-  return Response.json({ book, recommendedBooks });
+  return Response.json({ book, recommendedBooks, isBookmarked });
 }
 
 // Helper function to truncate text without breaking words
@@ -38,9 +55,14 @@ function truncateText(text: string, maxChars: number): string {
 export default function BookDetail({
   loaderData,
 }: {
-  loaderData: { book: BookType; recommendedBooks: BookType[] };
+  loaderData: {
+    book: BookType;
+    recommendedBooks: BookType[];
+    isBookmarked: boolean;
+  };
 }) {
-  const { book, recommendedBooks } = loaderData;
+  const { book, recommendedBooks, isBookmarked } = loaderData;
+  const fetcher = useFetcher();
   const [isDescriptionExpanded, setIsDescriptionExpanded] = useState(false);
   const maxChars = 250;
   const truncatedDescription = truncateText(book.description, maxChars);
@@ -54,9 +76,6 @@ export default function BookDetail({
           className="w-full rounded-lg shadow-lg"
         />
       </div>
-      <button className="absolute top-2 right-2 text-gray-600 hover:text-black">
-        <FaBookmark size={24} />
-      </button>
 
       <h1 className="text-2xl md:text-3xl font-bold text-center mt-4">
         {book.title}
@@ -73,6 +92,20 @@ export default function BookDetail({
           <span className="text-lg">{book.pageCount}</span>
         </div>
         <div className="text-lg">{book.genres[0]}</div>
+        <fetcher.Form method="post" action={`/books/${book._id}/bookmark`}>
+          <Button
+            type="submit"
+            variant="default"
+            className="p-2 hover:bg-white/80"
+            disabled={fetcher.state !== "idle"}
+          >
+            {isBookmarked ? (
+              <FaBookmark className="fill-primary-burgundy" size={24} />
+            ) : (
+              <FaRegBookmark size={24} />
+            )}
+          </Button>
+        </fetcher.Form>
       </div>
 
       <div className="mt-6 w-full">
