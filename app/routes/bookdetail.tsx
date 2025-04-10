@@ -3,6 +3,7 @@ import Book, { type BookType } from "../models/Book";
 import { AiOutlineStar, AiOutlineBook } from "react-icons/ai"; // Star & book icons
 import { FaBookmark } from "react-icons/fa"; // Bookmark icon
 import BookCard from "~/components/BookCard";
+import { getRecommendedBooks } from "~/utils/getRecommendedBooks";
 
 // Loader to fetch book data from MongoDB
 export async function loader({ request, params }: Route.LoaderArgs) {
@@ -11,11 +12,7 @@ export async function loader({ request, params }: Route.LoaderArgs) {
     throw new Response("Book Not Found", { status: 404 });
   }
 
-  const recommendedBooks = await Book.find({
-      _id: { $ne: book._id },
-      genres: { $in: book.genres },
-    })
-      .limit(3) // limit how many we show
+  const recommendedBooks = await getRecommendedBooks(book);
 
   return Response.json({ book, recommendedBooks });
 }
@@ -24,10 +21,9 @@ export async function loader({ request, params }: Route.LoaderArgs) {
 export default function BookDetail({
   loaderData,
 }: {
-  loaderData: { book: BookType, recommendedBooks: BookType[] };
+  loaderData: { book: BookType; recommendedBooks: BookType[] };
 }) {
   const { book, recommendedBooks } = loaderData;
-
 
   return (
     <div className="flex flex-col items-center p-4 md:p-10 max-w-3xl mx-auto">
@@ -69,7 +65,7 @@ export default function BookDetail({
         <div className="flex flex-wrap justify-center gap-4">
           {recommendedBooks.length > 0 ? (
             recommendedBooks.map((rBook: BookType) => (
-                <BookCard key={rBook._id.toString()} book={rBook} />
+              <BookCard key={rBook._id.toString()} book={rBook} />
             ))
           ) : (
             <p className="text-gray-500">No similar books found.</p>
