@@ -29,9 +29,11 @@ export async function loader({ request, params }: Route.LoaderArgs) {
     throw new Response("Book Not Found", { status: 404 });
   }
 
-  const isBookmarked = currentUser.bookCollection.some(
+  const bookCollectionEntry = currentUser.bookCollection.find(
     (entry) => entry.bookId?.toString() === book._id.toString(),
   );
+  const isBookmarked = !!bookCollectionEntry;
+  const progress = bookCollectionEntry?.progress || 0;
 
   const recommendedBooks = await getRecommendedBooks(book);
 
@@ -61,6 +63,7 @@ export async function loader({ request, params }: Route.LoaderArgs) {
     reviews: processedReviews,
     userHasReviewed,
     isBookmarked,
+    progress,
     currentUser,
   });
 }
@@ -87,6 +90,7 @@ export default function BookDetail({
     reviews: any[];
     userHasReviewed: boolean;
     currentUser: UserType;
+    progress: number;
   };
 }) {
   const {
@@ -96,11 +100,14 @@ export default function BookDetail({
     reviews,
     userHasReviewed,
     currentUser,
+    progress,
   } = loaderData;
   const fetcher = useFetcher();
   const [isDescriptionExpanded, setIsDescriptionExpanded] = useState(false);
   const maxChars = 250;
   const truncatedDescription = truncateText(book.description, maxChars);
+  const progressPercent =
+    progress && book.pageCount ? (progress / book.pageCount) * 100 : 0;
 
   return (
     <div className="flex flex-col items-center px-2 py-20 md:p-10 max-w-3xl mx-auto">
@@ -110,6 +117,19 @@ export default function BookDetail({
           alt={book.title}
           className="w-1/2 md:w-full rounded-lg shadow-lg mx-auto"
         />
+        {isBookmarked && progress !== undefined && (
+          <div className="mt-4">
+            <div className="w-full bg-primary-beige rounded-full h-2">
+              <div
+                className="bg-primary-blue h-2 rounded-full"
+                style={{ width: `${progressPercent}%` }}
+              />
+            </div>
+            <p className="text-sm text-center mt-1">
+              {progress} of {book.pageCount} pages read
+            </p>
+          </div>
+        )}
       </div>
 
       <h1 className="text-2xl md:text-3xl font-bold text-center mt-4">
