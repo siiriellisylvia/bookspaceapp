@@ -83,8 +83,14 @@ export default function FinishReadingSession({
               type="number"
               name="pageNumber"
               value={pageNumber}
-              onChange={(e) => setPageNumber(e.target.value)}
-              className="w-20 text-center text-3xl border-none focus:outline-none"
+              onChange={(e) => {
+                const value = e.target.value;
+                const numValue = Number(value);
+                if (numValue <= book.pageCount) {
+                  setPageNumber(value);
+                }
+              }}
+              className="w-20 text-center text-3xl border-none focus:outline-none [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
               min="1"
               max={book.pageCount}
             />
@@ -108,13 +114,13 @@ export default function FinishReadingSession({
           <div className="flex flex-row gap-4 text-sm w-full justify-between">
             <label className="block text-sm font-medium">Reading time</label>
             <div className="flex flex-row gap-2">
-            <input
-              type="number"
-              name="minutesRead"
-              value={minutesRead}
-              onChange={(e) => setMinutesRead(e.target.value)}
-              min="1"
-              className="w-15 text-center border-none focus:outline-none"
+              <input
+                type="number"
+                name="minutesRead"
+                value={minutesRead}
+                onChange={(e) => setMinutesRead(e.target.value)}
+                min="1"
+                className="w-15 text-center border-none focus:outline-none"
               />
               minutes
             </div>
