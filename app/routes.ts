@@ -13,8 +13,8 @@ export default [
     route("books/:id", "routes/bookdetail.tsx"),
     route("books/:id/bookmark", "routes/bookmark.tsx"),
     route("books/:id/review", "routes/review.tsx"),
+    route("books/:id/read", "routes/read.tsx"),
   ]),
   route("signup", "routes/signup.tsx"),
   route("signin", "routes/signin.tsx"),
-  route("books/:id/read", "routes/read.tsx"),
 ] satisfies RouteConfig;
