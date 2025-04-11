@@ -4,11 +4,13 @@ import { Button } from "~/components/ui/button";
 import { authenticateUser } from "~/services/auth.server";
 import type { Route } from "../+types/root";
 import Book from "~/models/Book";
+import User from "~/models/User";
 import { X } from "lucide-react";
+import mongoose from "mongoose";
 
 export async function loader({ request, params }: Route.LoaderArgs) {
-  const currentUser = await authenticateUser(request);
-  if (!currentUser) {
+  const currentUserId = await authenticateUser(request);
+  if (!currentUserId) {
     throw redirect("/signin");
   }
 
@@ -17,9 +19,27 @@ export async function loader({ request, params }: Route.LoaderArgs) {
     throw new Response("Book Not Found", { status: 404 });
   }
 
+  // Get the user with populated book collection
+  const user = await User.findById(currentUserId);
+  if (!user) {
+    throw new Response("User Not Found", { status: 404 });
+  }
+
+  // Find the book in the user's collection
+  const bookCollectionEntry = user.bookCollection.find(
+    (entry) => entry.bookId?.toString() === params.bookId
+  );
+
+  // Get the current progress (page number) for the book
+  const currentPage = bookCollectionEntry?.progress || 0;
+  
+  // If there's no progress yet, we'll default to page 1
+  const initialPageNumber = currentPage > 0 ? currentPage : 1;
+
   return Response.json({
-    currentUser,
+    currentUser: user,
     book,
+    initialPageNumber,
   });
 }
 
@@ -29,11 +49,12 @@ export default function FinishReadingSession({
   loaderData: {
     book: any;
     currentUser: any;
+    initialPageNumber: number;
   };
 }) {
-  const { book } = loaderData;
+  const { book, initialPageNumber } = loaderData;
   const navigate = useNavigate();
-  const [pageNumber, setPageNumber] = useState("30");
+  const [pageNumber, setPageNumber] = useState(String(initialPageNumber));
   const [minutesRead, setMinutesRead] = useState("15");
 
   const currentDate = new Date();
@@ -143,4 +164,64 @@ export default function FinishReadingSession({
       </form>
     </div>
   );
+}
+export async function action({ request, params }: Route.ActionArgs) {
+  const currentUser = await authenticateUser(request);
+  if (!currentUser) {
+    throw redirect("/signin");
+  }
+
+  const bookId = params.bookId as string;
+  const book = await Book.findById(bookId);
+  if (!book) {
+    throw new Response("Book Not Found", { status: 404 });
+  }
+
+  const user = await User.findById(currentUser);
+  if (!user) {
+    throw new Response("User Not Found", { status: 404 });
+  }
+
+  const formData = await request.formData();
+  const minutesRead = Number(formData.get("minutesRead") || "0");
+  const pageNumber = Number(formData.get("pageNumber") || "0");
+
+  // Find the book in the user's collection
+  const bookIndex = user.bookCollection.findIndex(
+    (entry) => entry.bookId?.toString() === bookId,
+  );
+
+  if (bookIndex === -1) {
+    // If the book is not in the collection, add it
+    const bookObjectId = new mongoose.Types.ObjectId(bookId);
+    user.bookCollection.push({
+      bookId: bookObjectId,
+      progress: pageNumber,
+      isCurrentlyReading: true,
+      readingSessions: [
+        {
+          startTime: new Date(Date.now() - minutesRead * 60 * 1000), // Approximate start time
+          endTime: new Date(),
+          pagesRead: pageNumber,
+          minutesRead: minutesRead,
+        },
+      ],
+    });
+  } else {
+    // Add a new reading session to the existing book entry
+    user.bookCollection[bookIndex].readingSessions.push({
+      startTime: new Date(Date.now() - minutesRead * 60 * 1000), // Approximate start time
+      endTime: new Date(),
+      pagesRead: pageNumber - (user.bookCollection[bookIndex].progress || 0),
+      minutesRead: minutesRead,
+    });
+
+    // Update the overall progress to the current page
+    user.bookCollection[bookIndex].progress = pageNumber;
+  }
+
+  await user.save();
+
+  // Redirect back to the book detail page
+  return redirect(`/books/${bookId}`);
 }
