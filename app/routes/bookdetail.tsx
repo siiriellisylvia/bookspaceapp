@@ -34,6 +34,7 @@ export async function loader({ request, params }: Route.LoaderArgs) {
   );
   const isBookmarked = !!bookCollectionEntry;
   const progress = bookCollectionEntry?.progress || 0;
+  const isCurrentlyReading = bookCollectionEntry?.isCurrentlyReading || false;
 
   const recommendedBooks = await getRecommendedBooks(book);
 
@@ -64,6 +65,7 @@ export async function loader({ request, params }: Route.LoaderArgs) {
     userHasReviewed,
     isBookmarked,
     progress,
+    isCurrentlyReading,
     currentUser,
   });
 }
@@ -91,6 +93,7 @@ export default function BookDetail({
     userHasReviewed: boolean;
     currentUser: UserType;
     progress: number;
+    isCurrentlyReading: boolean;
   };
 }) {
   const {
@@ -101,6 +104,7 @@ export default function BookDetail({
     userHasReviewed,
     currentUser,
     progress,
+    isCurrentlyReading,
   } = loaderData;
   const fetcher = useFetcher();
   const [isDescriptionExpanded, setIsDescriptionExpanded] = useState(false);
@@ -117,7 +121,7 @@ export default function BookDetail({
           alt={book.title}
           className="w-1/2 md:w-full rounded-lg shadow-lg mx-auto"
         />
-        {isBookmarked && progress !== undefined && (
+        {isBookmarked && isCurrentlyReading && progress !== undefined && (
           <div className="mt-4">
             <div className="w-full bg-primary-beige rounded-full h-2">
               <div
@@ -155,6 +159,7 @@ export default function BookDetail({
               type="submit"
               variant="default"
               disabled={fetcher.state !== "idle"}
+              className="text-xs md:text-lg"
             >
               {isBookmarked ? (
                 <FaBookmark size={24} />
@@ -166,9 +171,21 @@ export default function BookDetail({
           </fetcher.Form>
           {isBookmarked && (
             <Link to={`/books/${book._id}/read`}>
-              <Button variant="default" className="flex items-center gap-2">
+              <Button
+                variant="default"
+                className="flex items-center gap-2 text-xs md:text-lg"
+                onClick={() => {
+                  // Set isCurrentlyReading to true when clicking the read button
+                  if (!isCurrentlyReading) {
+                    fetcher.submit(
+                      { action: "setCurrentlyReading" },
+                      { method: "post", action: `/books/${book._id}/bookmark` },
+                    );
+                  }
+                }}
+              >
                 <FaBookOpen size={20} />
-                Read
+                {isCurrentlyReading ? "Continue" : "Read"}
               </Button>
             </Link>
           )}

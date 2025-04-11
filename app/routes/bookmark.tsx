@@ -23,23 +23,40 @@ export async function action({ request, params }: Route.ActionArgs) {
     (entry) => entry.bookId?.toString() === bookId,
   );
 
-  let isBookmarked;
+  const formData = await request.formData();
+  const action = formData.get("action");
 
-  if (bookIndex !== -1) {
-    // Remove book from collection (Unbookmark)
-    user.bookCollection.splice(bookIndex, 1);
-    isBookmarked = false;
+  let isBookmarked;
+  let isCurrentlyReading;
+
+  if (action === "setCurrentlyReading") {
+    // Set isCurrentlyReading to true for the book
+    if (bookIndex !== -1) {
+      user.bookCollection[bookIndex].isCurrentlyReading = true;
+      isCurrentlyReading = true;
+      isBookmarked = true;
+    }
   } else {
-    // Add book to collection with default progress (Bookmark)
-    user.bookCollection.push({
-      bookId: bookObjectId,
-      progress: 0,
-    });
-    isBookmarked = true;
+    // Handle bookmark/unbookmark
+    if (bookIndex !== -1) {
+      // Remove book from collection (Unbookmark)
+      user.bookCollection.splice(bookIndex, 1);
+      isBookmarked = false;
+      isCurrentlyReading = false;
+    } else {
+      // Add book to collection with default progress (Bookmark)
+      user.bookCollection.push({
+        bookId: bookObjectId,
+        progress: 0,
+        isCurrentlyReading: false,
+      });
+      isBookmarked = true;
+      isCurrentlyReading = false;
+    }
   }
 
   await user.save();
 
   // Return the updated state to the client
-  return Response.json({ isBookmarked });
+  return Response.json({ isBookmarked, isCurrentlyReading });
 }
