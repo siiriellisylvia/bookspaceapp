@@ -103,12 +103,12 @@ export default function BookDetail({
   const truncatedDescription = truncateText(book.description, maxChars);
 
   return (
-    <div className="flex flex-col items-center p-4 md:p-10 max-w-3xl mx-auto">
+    <div className="flex flex-col items-center px-2 py-20 md:p-10 max-w-3xl mx-auto">
       <div className="relative w-full max-w-sm">
         <img
           src={book.coverImage?.url}
           alt={book.title}
-          className="w-full rounded-lg shadow-lg"
+          className="w-1/2 md:w-full rounded-lg shadow-lg mx-auto"
         />
       </div>
 
@@ -122,13 +122,13 @@ export default function BookDetail({
       <div className="flex items-center gap-6 mt-4 text-primary-beige">
         <div className="flex items-center gap-1">
           <AiOutlineStar size={20} className="text-primary-beige" />
-          <span className="text-lg">{book.rating.toFixed(1)}</span>
+          <span className="text-sm md:text-lg">{book.rating.toFixed(1)}</span>
         </div>
         <div className="flex items-center gap-1">
           <AiOutlineBook size={20} />
-          <span className="text-lg">{book.pageCount}</span>
+          <span className="text-sm md:text-lg">{book.pageCount}</span>
         </div>
-        <div className="text-lg">{book.genres[0]}</div>
+        <div className="text-sm md:text-lg">{book.genres[0]}</div>
         <fetcher.Form method="post" action={`/books/${book._id}/bookmark`}>
           <Button
             type="submit"
@@ -141,7 +141,6 @@ export default function BookDetail({
               <FaRegBookmark size={24} />
             )}
             {isBookmarked ? "Bookmarked" : "Bookmark"}
-            
           </Button>
         </fetcher.Form>
       </div>

@@ -1,5 +1,5 @@
 import { NavLink } from "react-router";
-import { LibraryBig, House, SquareUserRound } from "lucide-react";
+import { LibraryBig, House, SquareUserRound, ChartBarIcon } from "lucide-react";
 import logo from "~/assets/logo-beige.svg";
 
 export default function NavBar() {
@@ -32,6 +32,13 @@ export function MobileNav() {
         <LibraryBig size={20} strokeWidth={1.5} />
         BOOKS
       </NavLink>
+      <NavLink
+        to="/"
+        className="flex flex-col items-center justify-center gap-1"
+      >
+        <ChartBarIcon size={20} strokeWidth={1.5} />
+       STATS
+      </NavLink>{" "}
       <NavLink
         to="/profile"
         className="flex flex-col items-center justify-center gap-1"

@@ -53,7 +53,7 @@ export default function Home({
   const { bookCollection } = loaderData;
 
   return (
-    <div className="flex flex-col gap-4 items-center max-w-4xl mx-auto">
+    <div className="flex flex-col gap-4 px-2 py-20 md:py-10 items-center max-w-4xl mx-auto">
       <h2>Your book collection</h2>
       {bookCollection.length === 0 ? (
         <p>No books in your collection yet.</p>
@@ -61,7 +61,7 @@ export default function Home({
         <div className="flex flex-wrap justify-center gap-4">
           {bookCollection.map((entry, index) =>
             entry.book ? (
-                <BookCard book={entry.book} progress={entry.progress} />
+              <BookCard book={entry.book} progress={entry.progress} />
             ) : (
               <p key={index} className="text-red-500">
                 Error: Book not found

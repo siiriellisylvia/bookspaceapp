@@ -65,7 +65,7 @@ export default function BooksPage({
   };
 
   return (
-    <section className="flex flex-col mx-auto px-2 lg:px-40 py-2 lg:py-10">
+    <section className="flex flex-col mx-auto px-2 py-20 lg:px-40  lg:py-10">
       {/* search and filter section */}
       <div className="flex flex-col justify-between items-center gap-4">
         {/* search input */}

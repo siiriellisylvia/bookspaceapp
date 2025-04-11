@@ -34,7 +34,7 @@ export default function ProfilePage({
   const { user, userBooks } = loaderData;
 
   return (
-    <main className="flex flex-col items-center mt-20 h-screen mx-4 lg:mx-60">
+    <main className="flex flex-col items-center px-2 py-20 md:px-40 md:py-10 h-screen mx-4 lg:mx-60">
       <div className="flex flex-col items-center gap-4">
         <div className="relative">
           <img
@@ -46,7 +46,7 @@ export default function ProfilePage({
         <h1>{user.email}</h1>
       </div>
       <div className="w-full mt-6">
-        <Accordion type="single" collapsible className="w-1/2 mx-auto">
+        <Accordion type="single" collapsible className="w-full md:w-1/2 mx-auto">
           <AccordionItem value="saved-books">
             <AccordionTrigger className="flex gap-2">
               <FaBookmark />
