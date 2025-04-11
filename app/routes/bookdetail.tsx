@@ -7,11 +7,11 @@ import {
   AiOutlineDown,
   AiOutlineUp,
 } from "react-icons/ai"; // Star & book icons
-import { FaBookmark, FaRegBookmark } from "react-icons/fa"; // Bookmark icons
+import { FaBookmark, FaRegBookmark, FaBookOpen } from "react-icons/fa"; // Bookmark icons
 import BookCard from "~/components/BookCard";
 import { getRecommendedBooks } from "~/utils/getRecommendedBooks";
 import { useState } from "react";
-import { redirect, useFetcher } from "react-router";
+import { redirect, useFetcher, Link } from "react-router";
 import { getAuthUser } from "~/services/auth.server";
 import { Button } from "~/components/ui/button";
 import Review from "~/models/Review";
@@ -129,20 +129,30 @@ export default function BookDetail({
           <span className="text-sm md:text-lg">{book.pageCount}</span>
         </div>
         <div className="text-sm md:text-lg">{book.genres[0]}</div>
-        <fetcher.Form method="post" action={`/books/${book._id}/bookmark`}>
-          <Button
-            type="submit"
-            variant="default"
-            disabled={fetcher.state !== "idle"}
-          >
-            {isBookmarked ? (
-              <FaBookmark size={24} />
-            ) : (
-              <FaRegBookmark size={24} />
-            )}
-            {isBookmarked ? "Bookmarked" : "Bookmark"}
-          </Button>
-        </fetcher.Form>
+        <div className="flex gap-2">
+          <fetcher.Form method="post" action={`/books/${book._id}/bookmark`}>
+            <Button
+              type="submit"
+              variant="default"
+              disabled={fetcher.state !== "idle"}
+            >
+              {isBookmarked ? (
+                <FaBookmark size={24} />
+              ) : (
+                <FaRegBookmark size={24} />
+              )}
+              {isBookmarked ? "Bookmarked" : "Bookmark"}
+            </Button>
+          </fetcher.Form>
+          {isBookmarked && (
+            <Link to={`/books/${book._id}/read`}>
+              <Button variant="default" className="flex items-center gap-2">
+                <FaBookOpen size={20} />
+                Read
+              </Button>
+            </Link>
+          )}
+        </div>
       </div>
 
       <div className="mt-6 w-full">

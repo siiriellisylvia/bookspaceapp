@@ -16,4 +16,5 @@ export default [
   ]),
   route("signup", "routes/signup.tsx"),
   route("signin", "routes/signin.tsx"),
+  route("books/:id/read", "routes/read.tsx"),
 ] satisfies RouteConfig;
