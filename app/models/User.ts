@@ -24,6 +24,13 @@ const userSchema = new Schema(
         bookId: { type: Schema.Types.ObjectId, ref: "Book" },
         progress: { type: Number, default: 0 },
         isCurrentlyReading: { type: Boolean, default: false },
+        readingSessions: [{
+          startTime: { type: Date, default: null },
+          endTime: { type: Date, default: null },
+          pagesRead: { type: Number, default: 0 },
+          minutesRead: { type: Number, default: 0 }
+        }],
+        isFinished: { type: Boolean, default: false },
         _id: false, // prevent Mongoose from creating an automatic _id for each entry
       },
     ],
