@@ -46,7 +46,7 @@ export default function ReadMode({
         >
           <X />
         </Button>
-        <Button variant="outline" className="md:ml-auto">Finish reading session</Button>
+        <Button onClick={() => navigate(`/books/${book._id}/finish-reading-session`)} variant="outline" className="md:ml-auto">Finish reading session</Button>
       </div>
       <h1 className="text-2xl md:text-3xl font-bold text-center mt-4">
         {book.title}
