@@ -7,7 +7,7 @@ import {
   AiOutlineDown,
   AiOutlineUp,
 } from "react-icons/ai"; // Star & book icons
-import { FaBookmark, FaRegBookmark, FaBookOpen } from "react-icons/fa"; // Bookmark icons
+import { FaBookmark, FaRegBookmark, FaBookOpen, FaBook } from "react-icons/fa"; // Bookmark icons
 import BookCard from "~/components/BookCard";
 import { getRecommendedBooks } from "~/utils/getRecommendedBooks";
 import { useState } from "react";
@@ -123,7 +123,7 @@ export default function BookDetail({
         />
         {isBookmarked && isCurrentlyReading && progress !== undefined && (
           <div className="mt-4">
-            <div className="w-full bg-primary-beige rounded-full h-2">
+            <div className="w-1/2 mx-auto md:w-full bg-primary-beige rounded-full h-2">
               <div
                 className="bg-primary-blue h-2 rounded-full"
                 style={{ width: `${progressPercent}%` }}
@@ -166,7 +166,7 @@ export default function BookDetail({
               ) : (
                 <FaRegBookmark size={24} />
               )}
-              {isBookmarked ? "Bookmarked" : "Bookmark"}
+              {isBookmarked ? "" : "Bookmark"}
             </Button>
           </fetcher.Form>
           {isBookmarked && (
@@ -184,7 +184,7 @@ export default function BookDetail({
                   }
                 }}
               >
-                <FaBookOpen size={20} />
+                {isCurrentlyReading ? <FaBookOpen size={20} /> : <FaBook size={20} />}
                 {isCurrentlyReading ? "Continue" : "Read"}
               </Button>
             </Link>
