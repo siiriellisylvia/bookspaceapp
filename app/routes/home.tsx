@@ -4,6 +4,13 @@ import { Link, redirect } from "react-router";
 import BookCard from "~/components/BookCard";
 import { type BookType } from "../models/Book";
 import { getAuthUserId } from "../services/auth.server";
+import {
+  Carousel,
+  CarouselContent,
+  CarouselItem,
+  CarouselNext,
+  CarouselPrevious,
+} from "~/components/ui/carousel";
 
 export function meta({}: Route.MetaArgs) {
   return [
@@ -58,17 +65,29 @@ export default function Home({
       {bookCollection.length === 0 ? (
         <p>No books in your collection yet.</p>
       ) : (
-        <div className="flex flex-wrap justify-center gap-4">
-          {bookCollection.map((entry, index) =>
-            entry.book ? (
-              <BookCard book={entry.book} progress={entry.progress} />
-            ) : (
-              <p key={index} className="text-red-500">
-                Error: Book not found
-              </p> // 🔍 Debugging
-            ),
-          )}
-        </div>
+        <Carousel
+          className="w-full"
+          opts={{
+            align: "start",
+            containScroll: "trimSnaps",
+            skipSnaps: false,
+          }}
+        >
+          <CarouselContent>
+            {bookCollection.map((entry) =>
+              entry.book ? (
+                <CarouselItem
+                  key={entry.book._id.toString()}
+                  className="basis-1/3.5 lg:basis-1/4"
+                >
+                  <BookCard book={entry.book} progress={entry.progress} />
+                </CarouselItem>
+              ) : null,
+            )}
+          </CarouselContent>
+          <CarouselPrevious />
+          <CarouselNext />
+        </Carousel>
       )}
     </div>
   );
