@@ -129,7 +129,7 @@ export default function BookDetail({
         />
         {isBookmarked && hasReadingSessions && (
           <div className="mt-4">
-            <div className="w-full bg-primary-beige rounded-full h-2">
+            <div className="w-1/2 mx-auto md:w-full bg-primary-beige rounded-full h-2">
               <div
                 className="bg-primary-blue h-2 rounded-full"
                 style={{ width: `${progressPercent}%` }}
