@@ -23,7 +23,6 @@ const userSchema = new Schema(
       {
         bookId: { type: Schema.Types.ObjectId, ref: "Book" },
         progress: { type: Number, default: 0 },
-        isCurrentlyReading: { type: Boolean, default: false },
         readingSessions: [{
           startTime: { type: Date, default: null },
           endTime: { type: Date, default: null },

@@ -33,8 +33,13 @@ export async function loader({ request, params }: Route.LoaderArgs) {
     (entry) => entry.bookId?.toString() === book._id.toString(),
   );
   const isBookmarked = !!bookCollectionEntry;
+  const hasReadingSessions =
+    (bookCollectionEntry?.readingSessions || []).length > 0;
   const progress = bookCollectionEntry?.progress || 0;
-  const isCurrentlyReading = bookCollectionEntry?.isCurrentlyReading || false;
+  const progressPercent =
+    progress && book.pageCount ? (progress / book.pageCount) * 100 : 0;
+
+  console.log("hasReadingSessions", hasReadingSessions);
 
   const recommendedBooks = await getRecommendedBooks(book);
 
@@ -65,7 +70,8 @@ export async function loader({ request, params }: Route.LoaderArgs) {
     userHasReviewed,
     isBookmarked,
     progress,
-    isCurrentlyReading,
+    hasReadingSessions,
+    progressPercent,
     currentUser,
   });
 }
@@ -93,7 +99,8 @@ export default function BookDetail({
     userHasReviewed: boolean;
     currentUser: UserType;
     progress: number;
-    isCurrentlyReading: boolean;
+    hasReadingSessions: boolean;
+    progressPercent: number;
   };
 }) {
   const {
@@ -104,14 +111,13 @@ export default function BookDetail({
     userHasReviewed,
     currentUser,
     progress,
-    isCurrentlyReading,
+    hasReadingSessions,
+    progressPercent,
   } = loaderData;
   const fetcher = useFetcher();
   const [isDescriptionExpanded, setIsDescriptionExpanded] = useState(false);
   const maxChars = 250;
   const truncatedDescription = truncateText(book.description, maxChars);
-  const progressPercent =
-    progress && book.pageCount ? (progress / book.pageCount) * 100 : 0;
 
   return (
     <div className="flex flex-col items-center px-2 py-20 md:p-10 max-w-3xl mx-auto">
@@ -121,9 +127,9 @@ export default function BookDetail({
           alt={book.title}
           className="w-1/2 md:w-full rounded-lg shadow-lg mx-auto"
         />
-        {isBookmarked && isCurrentlyReading && progress !== undefined && (
+        {isBookmarked && hasReadingSessions && (
           <div className="mt-4">
-            <div className="w-1/2 mx-auto md:w-full bg-primary-beige rounded-full h-2">
+            <div className="w-full bg-primary-beige rounded-full h-2">
               <div
                 className="bg-primary-blue h-2 rounded-full"
                 style={{ width: `${progressPercent}%` }}
@@ -176,7 +182,7 @@ export default function BookDetail({
                 className="flex items-center gap-2 text-xs md:text-lg"
                 onClick={() => {
                   // Set isCurrentlyReading to true when clicking the read button
-                  if (!isCurrentlyReading) {
+                  if (!hasReadingSessions) {
                     fetcher.submit(
                       { action: "setCurrentlyReading" },
                       { method: "post", action: `/books/${book._id}/bookmark` },
@@ -184,8 +190,12 @@ export default function BookDetail({
                   }
                 }}
               >
-                {isCurrentlyReading ? <FaBookOpen size={20} /> : <FaBook size={20} />}
-                {isCurrentlyReading ? "Continue" : "Read"}
+                {hasReadingSessions ? (
+                  <FaBookOpen size={20} />
+                ) : (
+                  <FaBook size={20} />
+                )}
+                {hasReadingSessions ? "Continue" : "Read"}
               </Button>
             </Link>
           )}
