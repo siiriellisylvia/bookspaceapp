@@ -58,8 +58,15 @@ export async function loader({ request }: Route.LoaderArgs) {
   });
 }
 
-export default function Home() {
-  const loaderData = useLoaderData<typeof loader>();
+export default function Home({
+  loaderData,
+}: {
+  loaderData: {
+    book: BookType;
+    bookCollection: { book: BookType; progress: number }[];
+    userName: string;
+  };
+}) {
   const { bookCollection, userName } = loaderData;
 
   return (
