@@ -57,7 +57,7 @@ h5 {
 }
 
 p {
-  @apply text-base dark:text-primary-beige;
+  @apply text-sm md:text-base dark:text-primary-beige;
 }
 
 @theme inline {

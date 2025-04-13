@@ -93,17 +93,17 @@ export default function ProfilePage({
             className="w-24 h-24 rounded-full border-1 border-primary-burgundy shadow-md"
           />
         </div>
-        <h1>{user.email}</h1>
+        <h1>{user.name}</h1>
       </div>
 
       {/* Reading Goal displayed above accordion */}
       <div className="w-full my-6 max-w-md mx-auto">
         {user.readingGoal && user.readingGoal.isActive && (
           <div className="flex items-center justify-between mb-2">
-            <h2 className="font-semibold flex items-center gap-2">
+            <p className="flex items-center gap-2">
               <FaChartLine />
-              Reading Goal
-            </h2>
+              Reading goal
+            </p>
           </div>
         )}
         {showReadingGoal()}
@@ -116,7 +116,7 @@ export default function ProfilePage({
           className="w-full md:w-1/2 mx-auto"
         >
           <AccordionItem value="saved-books">
-            <AccordionTrigger className="flex gap-2">
+            <AccordionTrigger className="flex gap-2 font-sans text-sm">
               <FaBookmark />
               Saved Books
             </AccordionTrigger>
@@ -134,7 +134,7 @@ export default function ProfilePage({
           </AccordionItem>
 
           <AccordionItem value="notes-quotes">
-            <AccordionTrigger className="flex items-center gap-2">
+            <AccordionTrigger className="flex items-center gap-2 font-sans text-sm">
               <FaQuoteLeft />
               My Notes & Quotes
             </AccordionTrigger>
@@ -144,7 +144,7 @@ export default function ProfilePage({
           </AccordionItem>
 
           <AccordionItem value="my-books">
-            <AccordionTrigger className="flex items-center gap-2">
+            <AccordionTrigger className="flex items-center gap-2 font-sans text-sm">
               <FaBook />
               My Books
             </AccordionTrigger>
@@ -154,7 +154,7 @@ export default function ProfilePage({
           </AccordionItem>
 
           <AccordionItem value="my-reviews">
-            <AccordionTrigger className="flex items-center gap-2">
+            <AccordionTrigger className="flex items-center gap-2 font-sans text-sm">
               <FaStar />
               My Reviews
             </AccordionTrigger>
