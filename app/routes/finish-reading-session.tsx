@@ -1,5 +1,5 @@
-import { useState } from "react";
-import { redirect, useNavigate } from "react-router";
+import { useState, useEffect } from "react";
+import { redirect, useNavigate, useSearchParams } from "react-router";
 import { Button } from "~/components/ui/button";
 import { authenticateUser } from "~/services/auth.server";
 import type { Route } from "../+types/root";
@@ -56,6 +56,34 @@ export default function FinishReadingSession({
   const navigate = useNavigate();
   const [pageNumber, setPageNumber] = useState(String(initialPageNumber));
   const [minutesRead, setMinutesRead] = useState("15");
+  const [searchParams] = useSearchParams();
+
+  // Read the minutesRead from query parameter or sessionStorage
+  useEffect(() => {
+    // 1. First try to get the value from URL parameters
+    const minutesFromTimer = searchParams.get('minutesRead');
+
+    // 2. If URL param doesn't exist or is invalid, try sessionStorage
+    let minutesValue = null;
+    if (minutesFromTimer && !isNaN(Number(minutesFromTimer))) {
+      minutesValue = String(Number(minutesFromTimer));
+    } else {
+      try {
+        const storedMinutes = sessionStorage.getItem('minutesRead');
+        if (storedMinutes && !isNaN(Number(storedMinutes))) {
+          minutesValue = storedMinutes;
+          // Clear the value from storage after using it
+          sessionStorage.removeItem('minutesRead');
+        }
+      } catch (e) {
+      }
+    }
+
+    // 3. Update the state if we have a valid value
+    if (minutesValue) {
+      setMinutesRead(minutesValue);
+    }
+  }, [searchParams]);
 
   const currentDate = new Date();
   const formattedDate = currentDate.toLocaleDateString("en-US", {
