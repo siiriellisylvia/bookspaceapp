@@ -34,9 +34,11 @@ const userSchema = new Schema(
       },
     ],
     readingGoal: {
-      daily: {
-        targetMinutes: Number,
-      },
+      type: { type: String, enum: ['minutes', 'pages', 'books'], default: 'minutes' },
+      frequency: { type: String, enum: ['daily', 'weekly', 'monthly'], default: 'daily' },
+      target: { type: Number, default: 0 },
+      isActive: { type: Boolean, default: false },
+      createdAt: { type: Date, default: Date.now },
     },
   },
   { timestamps: true }, // Adds createdAt & updatedAt fields
