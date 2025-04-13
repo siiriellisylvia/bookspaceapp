@@ -1,6 +1,6 @@
 import type { Route } from "./+types/home";
 import User, { type UserType } from "../models/User";
-import { Link, redirect } from "react-router";
+import { Link, redirect, useLoaderData } from "react-router";
 import BookCard from "~/components/BookCard";
 import { type BookType } from "../models/Book";
 import { getAuthUserId } from "../services/auth.server";
@@ -42,32 +42,29 @@ export async function loader({ request }: Route.LoaderArgs) {
     .map((entry) => ({
       book: entry.bookId || null, // Ensure we don't crash on undefined
       progress: entry.progress,
-      status: entry.status || 'bookmarked'
+      status: entry.status || "bookmarked",
     }))
-    .filter((entry) => 
-      entry.book !== null && 
-      entry.status !== 'finished' && 
-      entry.progress !== undefined && 
-      entry.progress > 0
+    .filter(
+      (entry) =>
+        entry.book !== null &&
+        entry.status !== "finished" &&
+        entry.progress !== undefined &&
+        entry.progress > 0,
     ); // Remove finished books, invalid books, and books with no progress
 
-  return Response.json({ bookCollection });
+  return Response.json({
+    bookCollection,
+    userName: user.name || "Reader",
+  });
 }
 
-export default function Home({
-  loaderData,
-}: {
-  loaderData: {
-    user: UserType;
-    book: BookType;
-    authUserId: string;
-    bookCollection: { book: BookType; progress: number }[];
-  };
-}) {
-  const { bookCollection } = loaderData;
+export default function Home() {
+  const loaderData = useLoaderData<typeof loader>();
+  const { bookCollection, userName } = loaderData;
 
   return (
     <div className="flex flex-col gap-4 px-2 py-20 md:py-10 items-center max-w-4xl mx-auto">
+      <h1 className="text-2xl font-bold mb-4">Welcome back, {userName}!</h1>
       <h2>Currently reading</h2>
       {bookCollection.length === 0 ? (
         <p>No books in your collection yet.</p>
