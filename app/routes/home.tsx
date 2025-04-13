@@ -37,14 +37,19 @@ export async function loader({ request }: Route.LoaderArgs) {
   }
 
   // Ensure bookCollection is correctly structured, remove undefined books,
-  // and filter out finished books
+  // and filter out finished books and books with no progress
   const bookCollection = user.bookCollection
     .map((entry) => ({
       book: entry.bookId || null, // Ensure we don't crash on undefined
       progress: entry.progress,
       status: entry.status || 'bookmarked'
     }))
-    .filter((entry) => entry.book !== null && entry.status !== 'finished'); // Remove finished and invalid books
+    .filter((entry) => 
+      entry.book !== null && 
+      entry.status !== 'finished' && 
+      entry.progress !== undefined && 
+      entry.progress > 0
+    ); // Remove finished books, invalid books, and books with no progress
 
   return Response.json({ bookCollection });
 }
@@ -63,7 +68,7 @@ export default function Home({
 
   return (
     <div className="flex flex-col gap-4 px-2 py-20 md:py-10 items-center max-w-4xl mx-auto">
-      <h2>Your book collection</h2>
+      <h2>Currently reading</h2>
       {bookCollection.length === 0 ? (
         <p>No books in your collection yet.</p>
       ) : (
