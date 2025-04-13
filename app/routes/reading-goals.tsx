@@ -42,8 +42,8 @@ export default function ReadingGoalsPage({
   const [frequency, setFrequency] = useState(initialFrequency);
 
   return (
-    <div className="flex flex-col h-screen py-20 px-2">
-      <div className="w-full flex items-center justify-between">
+    <div className="flex flex-col h-screen py-20 px-2 md:px-40 md:py-10">
+      <div className="w-full flex items-center justify-between md:w-1/2 mx-auto">
         <Button
           variant="ghost"
           size="icon"
@@ -56,7 +56,7 @@ export default function ReadingGoalsPage({
 
       <form
         method="post"
-        className="flex flex-col flex-1 md:pb-12 w-full mx-auto"
+        className="flex flex-col flex-1 md:pb-12 w-full md:w-1/2 mx-auto"
       >
         <div className="flex flex-col gap-8 flex-1">
           <section className="flex flex-col gap-4 mx-auto">
@@ -141,7 +141,6 @@ export default function ReadingGoalsPage({
                 </SelectContent>
               </Select>
             </div>
-
           </section>
 
           {/* Submit button section */}

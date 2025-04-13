@@ -98,7 +98,7 @@ export default function FinishReadingSession({
   });
 
   return (
-    <div className="flex flex-col h-screen py-20 px-2 ">
+    <div className="flex flex-col h-screen py-20 px-2 md:px-40 md:py-10 md:w-1/2 mx-auto">
       <div className="w-full flex items-center justify-between">
         <Button
           variant="ghost"
@@ -120,7 +120,7 @@ export default function FinishReadingSession({
           <section className="flex flex-col gap-4 mx-auto">
             <div className="text-center mb-8">
               <p>Finish reading session</p>
-            <h1>What page did you stop on?</h1>
+              <h1>What page did you stop on?</h1>
             </div>
             <div className="flex items-center justify-center gap-4">
               <Button

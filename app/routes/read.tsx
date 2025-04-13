@@ -76,7 +76,7 @@ export default function ReadMode({
 
   return (
     <div className="flex flex-col gap-2 px-2 py-20 md:py-5 items-center h-screen">
-      <div className="flex flex-row gap-2 items-center justify-between w-full">
+      <div className="flex flex-row gap-2 items-center justify-between w-full md:w-1/2 mx-auto">
         <Button
           variant="ghost"
           size="icon"
