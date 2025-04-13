@@ -34,11 +34,13 @@ export async function loader({ request, params }: Route.LoaderArgs) {
     (entry) => entry.bookId?.toString() === book._id.toString(),
   );
   const isBookmarked = !!bookCollectionEntry;
-  const hasReadingSessions = (bookCollectionEntry?.readingSessions || []).length > 0;
+  const hasReadingSessions =
+    (bookCollectionEntry?.readingSessions || []).length > 0;
   const progress = bookCollectionEntry?.progress || 0;
-  const progressPercent = progress && book.pageCount ? (progress / book.pageCount) * 100 : 0;
+  const progressPercent =
+    progress && book.pageCount ? (progress / book.pageCount) * 100 : 0;
   const bookStatus = bookCollectionEntry?.status || null;
-  const isFinished = bookStatus === 'finished';
+  const isFinished = bookStatus === "finished";
 
   console.log("hasReadingSessions", hasReadingSessions);
 
@@ -177,7 +179,7 @@ export default function BookDetail({
           <span className="text-sm md:text-lg">{book.pageCount}</span>
         </div>
         <div className="text-sm md:text-lg">{book.genres[0]}</div>
-        
+
         <div className="flex gap-2">
           <fetcher.Form method="post" action={`/books/${book._id}/bookmark`}>
             <Button
@@ -253,7 +255,11 @@ export default function BookDetail({
         <div className="flex flex-wrap justify-center gap-4">
           {recommendedBooks.length > 0 ? (
             recommendedBooks.map((rBook: BookType) => (
-              <BookCard key={rBook._id.toString()} book={rBook} />
+              <BookCard
+                key={rBook._id.toString()}
+                book={rBook}
+                progress={undefined}
+              />
             ))
           ) : (
             <p className="text-gray-500">No similar books found.</p>
