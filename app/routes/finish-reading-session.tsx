@@ -27,12 +27,12 @@ export async function loader({ request, params }: Route.LoaderArgs) {
 
   // Find the book in the user's collection
   const bookCollectionEntry = user.bookCollection.find(
-    (entry) => entry.bookId?.toString() === params.bookId
+    (entry) => entry.bookId?.toString() === params.bookId,
   );
 
   // Get the current progress (page number) for the book
   const currentPage = bookCollectionEntry?.progress || 0;
-  
+
   // If there's no progress yet, we'll default to page 1
   const initialPageNumber = currentPage > 0 ? currentPage : 1;
 
@@ -70,8 +70,8 @@ export default function FinishReadingSession({
   });
 
   return (
-    <div className="flex flex-col items-center px-4 py-20 max-w-md mx-auto">
-      <div className="w-full flex items-center justify-between mb-6">
+    <div className="flex flex-col h-screen py-20 px-2 ">
+      <div className="w-full flex items-center justify-between">
         <Button
           variant="ghost"
           size="icon"
@@ -82,89 +82,103 @@ export default function FinishReadingSession({
         </Button>
       </div>
 
-      <form method="post" className="w-full">
-        <div className="flex flex-col gap-4 items-center">
-          <p className="text-xl font-semibold font-sans mx-auto">
-            Finish reading session
-          </p>
+      <form
+        method="post"
+        className="flex flex-col flex-1 md:pb-12 w-full mx-auto"
+      >
+        <div className="flex flex-col gap-8 flex-1">
+          {/* Page number section */}
 
-          <h1 className="text-lg font-medium">What page did you stop on?</h1>
-          <div className="flex items-center justify-center gap-4">
-            <Button
-              type="button"
-              variant="outline"
-              onClick={() =>
-                setPageNumber((prev) => String(Math.max(1, Number(prev) - 10)))
-              }
-              disabled={Number(pageNumber) <= 10}
-            >
-              -10
-            </Button>
-            <input
-              type="number"
-              name="pageNumber"
-              value={pageNumber}
-              onChange={(e) => {
-                const value = e.target.value;
-                const numValue = Number(value);
-                if (numValue <= book.pageCount) {
-                  setPageNumber(value);
+          <section className="flex flex-col gap-4 mx-auto">
+            <div className="text-center mb-8">
+              <p>Finish reading session</p>
+            <h1>What page did you stop on?</h1>
+            </div>
+            <div className="flex items-center justify-center gap-4">
+              <Button
+                type="button"
+                variant="outline"
+                onClick={() =>
+                  setPageNumber((prev) =>
+                    String(Math.max(1, Number(prev) - 10)),
+                  )
                 }
-              }}
-              className="w-20 text-center text-3xl border-none focus:outline-none [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
-              min="1"
-              max={book.pageCount}
-            />
-            <Button
-              type="button"
-              variant="outline"
-              onClick={() =>
-                setPageNumber((prev) =>
-                  String(Math.min(book.pageCount, Number(prev) + 10)),
-                )
-              }
-              disabled={Number(pageNumber) >= book.pageCount}
-            >
-              +10
-            </Button>
-          </div>
-          <p>of {book.pageCount} pages read</p>
-        </div>
-
-        <div className="flex flex-col gap-4 w-full">
-          <div className="flex flex-row gap-4 text-sm w-full justify-between">
-            <label className="block text-sm font-medium">Reading time</label>
-            <div className="flex flex-row gap-2">
+                disabled={Number(pageNumber) <= 10}
+              >
+                -10
+              </Button>
               <input
                 type="number"
-                name="minutesRead"
-                value={minutesRead}
-                onChange={(e) => setMinutesRead(e.target.value)}
+                name="pageNumber"
+                value={pageNumber}
+                onChange={(e) => {
+                  const value = e.target.value;
+                  const numValue = Number(value);
+                  if (numValue <= book.pageCount) {
+                    setPageNumber(value);
+                  }
+                }}
+                className="w-20 text-center text-3xl border-none focus:outline-none [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
                 min="1"
-                className="w-15 text-center border-none focus:outline-none"
+                max={book.pageCount}
               />
-              minutes
+              <Button
+                type="button"
+                variant="outline"
+                onClick={() =>
+                  setPageNumber((prev) =>
+                    String(Math.min(book.pageCount, Number(prev) + 10)),
+                  )
+                }
+                disabled={Number(pageNumber) >= book.pageCount}
+              >
+                +10
+              </Button>
             </div>
-          </div>
-          <div className="flex justify-between text-sm">
-            <div>Date</div>
-            <div>{formattedDate}</div>
-          </div>
-          <div className="flex justify-between text-sm">
-            <div>Time</div>
-            <div>{formattedTime}</div>
-          </div>
-        </div>
+            <p className="text-center">of {book.pageCount} pages read</p>
+          </section>
 
-        <div className="pt-4">
-          <Button type="submit" className="w-full">
-            Save
-          </Button>
+          {/* Reading details section */}
+          <section className="flex flex-col gap-6 p-5 rounded-lg border border-primary-beige dark:border-primary-beige">
+            <div className="flex flex-row gap-4 text-sm w-full justify-between">
+              <label className="block text-sm font-medium">Reading time</label>
+              <div className="flex flex-row gap-2">
+                <input
+                  type="number"
+                  name="minutesRead"
+                  value={minutesRead}
+                  onChange={(e) => setMinutesRead(e.target.value)}
+                  min="1"
+                  className="w-16 text-center border-none bg-transparent focus:outline-none"
+                />
+                minutes
+              </div>
+            </div>
+            <div className="flex justify-between text-sm border-t border-primary-beige dark:border-primary-beige pt-3">
+              <div>Date</div>
+              <div>{formattedDate}</div>
+            </div>
+            <div className="flex justify-between text-sm">
+              <div>Time</div>
+              <div>{formattedTime}</div>
+            </div>
+          </section>
+
+          {/* Spacer to push button to bottom when needed */}
+          <div className="flex-grow"></div>
+
+          {/* Submit button section */}
+          <section className="mt-auto">
+            <Button type="submit" className="w-full py-6 text-lg">
+              Save
+            </Button>
+          </section>
         </div>
       </form>
     </div>
   );
 }
+
 export async function action({ request, params }: Route.ActionArgs) {
   const currentUser = await authenticateUser(request);
   if (!currentUser) {

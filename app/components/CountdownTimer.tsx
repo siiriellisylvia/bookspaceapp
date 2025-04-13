@@ -63,7 +63,7 @@ export default function CountdownTimer() {
       </button>
 
       <div className="text-sm">
-        {isRunning ? "Reading..." : "Start reading"}
+        {isRunning ? "Reading..." : "Start reading timer"}
       </div>
     </div>
   );
