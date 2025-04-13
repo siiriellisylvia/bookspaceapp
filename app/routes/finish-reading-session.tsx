@@ -238,7 +238,7 @@ export async function action({ request, params }: Route.ActionArgs) {
     user.bookCollection.push({
       bookId: bookObjectId,
       progress: pageNumber,
-      isCurrentlyReading: true,
+      status: 'reading',
       readingSessions: [
         {
           startTime: new Date(Date.now() - minutesRead * 60 * 1000), // Approximate start time
@@ -259,6 +259,13 @@ export async function action({ request, params }: Route.ActionArgs) {
 
     // Update the overall progress to the current page
     user.bookCollection[bookIndex].progress = pageNumber;
+    
+    // Update the status based on progress
+    if (pageNumber >= book.pageCount) {
+      user.bookCollection[bookIndex].status = 'finished';
+    } else {
+      user.bookCollection[bookIndex].status = 'reading';
+    }
   }
 
   await user.save();

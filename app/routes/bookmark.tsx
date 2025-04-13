@@ -30,9 +30,9 @@ export async function action({ request, params }: Route.ActionArgs) {
   let isCurrentlyReading;
 
   if (action === "setCurrentlyReading") {
-    // Set isCurrentlyReading to true for the book
+    // Set status to 'reading' for the book
     if (bookIndex !== -1) {
-      user.bookCollection[bookIndex].isCurrentlyReading = true;
+      user.bookCollection[bookIndex].status = 'reading';
       isCurrentlyReading = true;
       isBookmarked = true;
     }
@@ -48,7 +48,7 @@ export async function action({ request, params }: Route.ActionArgs) {
       user.bookCollection.push({
         bookId: bookObjectId,
         progress: 0,
-        isCurrentlyReading: false,
+        status: 'bookmarked'
       });
       isBookmarked = true;
       isCurrentlyReading = false;
