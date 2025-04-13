@@ -35,10 +35,12 @@ export default function ReadMode({
   const { book } = loaderData;
   const navigate = useNavigate();
   const [elapsedMinutes, setElapsedMinutes] = useState(0);
+  const [timerCompleted, setTimerCompleted] = useState(false);
   const timerRef = useRef<CountdownTimerHandle>(null);
 
   const handleTimerComplete = (minutes: number) => {
     setElapsedMinutes(minutes);
+    setTimerCompleted(true);
   };
 
   const handleTimerStop = (minutes: number) => {
@@ -83,13 +85,15 @@ export default function ReadMode({
         >
           <X />
         </Button>
-        <Button
-          onClick={handleFinishReading}
-          variant="outline"
-          className="md:ml-auto"
-        >
-          Finish reading session
-        </Button>
+        {!timerCompleted && (
+          <Button
+            onClick={handleFinishReading}
+            variant="outline"
+            className="md:ml-auto"
+          >
+            Finish reading session
+          </Button>
+        )}
       </div>
       <div className="flex flex-col gap-2 items-center justify-center w-full">
         <p className="text-xl font-semibold font-sans mx-auto">Now reading</p>
@@ -107,6 +111,7 @@ export default function ReadMode({
         onTimerComplete={handleTimerComplete} 
         onTimerStop={handleTimerStop}
         onTimerUpdate={handleTimerUpdate}
+        onFinishReading={handleFinishReading}
       />
     </div>
   );

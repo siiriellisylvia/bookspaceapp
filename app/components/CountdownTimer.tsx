@@ -7,6 +7,7 @@ interface CountdownTimerProps {
   onTimerComplete?: (elapsedMinutes: number) => void;
   onTimerStop?: (elapsedMinutes: number) => void;
   onTimerUpdate?: (elapsedMinutes: number) => void;
+  onFinishReading?: () => void;
 }
 
 export interface CountdownTimerHandle {
@@ -14,7 +15,7 @@ export interface CountdownTimerHandle {
 }
 
 const CountdownTimer = forwardRef<CountdownTimerHandle, CountdownTimerProps>(
-  ({ onTimerComplete, onTimerStop, onTimerUpdate }, ref) => {
+  ({ onTimerComplete, onTimerStop, onTimerUpdate, onFinishReading }, ref) => {
     // Countdown in seconds (what's shown on screen)
     const [time, setTime] = useState(0); 
     
@@ -138,7 +139,7 @@ const CountdownTimer = forwardRef<CountdownTimerHandle, CountdownTimerProps>(
 
     return (
       <div className="flex flex-col items-center justify-center gap-4">
-        {!isRunning && time === 0 ? (
+        {!isRunning && time === 0 && initialSeconds === 0 ? (
           <>
             <div className="w-full flex flex-col items-center gap-2">
               <label htmlFor="minutes-input" className="text-sm">
@@ -183,6 +184,22 @@ const CountdownTimer = forwardRef<CountdownTimerHandle, CountdownTimerProps>(
               </Button>
             </div>
           </>
+        ) : !isRunning && time === 0 && initialSeconds > 0 ? (
+          <>
+            <div className="flex flex-col items-center gap-4 text-center">
+              <h2 className="text-2xl font-semibold">Well done, you've now read for {calculateElapsedMinutes()} minutes!</h2>
+              
+              {onFinishReading && (
+                <Button 
+                  onClick={onFinishReading}
+                  variant="outline"
+                  className="mt-4"
+                >
+                  Finish reading session
+                </Button>
+              )}
+            </div>
+          </>
         ) : (
           <div className="text-5xl font-semibold tabular-nums">
             {formatTime(time)}
@@ -214,7 +231,7 @@ const CountdownTimer = forwardRef<CountdownTimerHandle, CountdownTimerProps>(
             onClick={resetTimer}
             className="text-xs mt-1"
           >
-            Set new timer
+            Delete timer
           </Button>
         )}
       </div>
