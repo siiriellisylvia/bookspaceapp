@@ -36,13 +36,15 @@ export async function loader({ request }: Route.LoaderArgs) {
     throw new Response("User Not Found", { status: 404 });
   }
 
-  // Ensure bookCollection is correctly structured and remove undefined books
+  // Ensure bookCollection is correctly structured, remove undefined books,
+  // and filter out finished books
   const bookCollection = user.bookCollection
     .map((entry) => ({
       book: entry.bookId || null, // Ensure we don't crash on undefined
       progress: entry.progress,
+      status: entry.status || 'bookmarked'
     }))
-    .filter((entry) => entry.book !== null); // Remove invalid books
+    .filter((entry) => entry.book !== null && entry.status !== 'finished'); // Remove finished and invalid books
 
   return Response.json({ bookCollection });
 }
