@@ -18,6 +18,7 @@ export default [
       "books/:bookId/finish-reading-session",
       "routes/finish-reading-session.tsx",
     ),
+    route("reading-goals", "routes/reading-goals.tsx"),
   ]),
   route("signup", "routes/signup.tsx"),
   route("signin", "routes/signin.tsx"),
