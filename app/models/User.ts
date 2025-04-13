@@ -34,7 +34,7 @@ const userSchema = new Schema(
       },
     ],
     readingGoal: {
-      type: { type: String, enum: ['minutes', 'pages', 'books'], default: 'minutes' },
+      type: { type: String, enum: ['minutes', 'hours', 'pages', 'books'], default: 'minutes' },
       frequency: { type: String, enum: ['daily', 'weekly', 'monthly'], default: 'daily' },
       target: { type: Number, default: 0 },
       isActive: { type: Boolean, default: false },
