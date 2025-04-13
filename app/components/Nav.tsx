@@ -9,6 +9,7 @@ export default function NavBar() {
       <div className="flex flex-row gap-10 items-center justify-center">
         <NavLink to="/">Home</NavLink>
         <NavLink to="/books">Books</NavLink>
+        <NavLink to="/insights">Insights</NavLink>
         <NavLink to="/profile">Profile</NavLink>
       </div>
     </nav>
@@ -33,7 +34,7 @@ export function MobileNav() {
         BOOKS
       </NavLink>
       <NavLink
-        to="/"
+        to="/insights"
         className="flex flex-col items-center justify-center gap-1"
       >
         <ChartBarIcon size={20} strokeWidth={1.5} />
