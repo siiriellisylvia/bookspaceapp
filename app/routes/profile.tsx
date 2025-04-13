@@ -1,8 +1,14 @@
-import { Form, redirect } from "react-router";
+import { Form, redirect, Link, useSubmit } from "react-router";
 import type { Route } from "../+types/root";
 import { type UserType } from "../models/User";
 import { getAuthUser } from "../services/auth.server";
-import { FaBookmark, FaQuoteLeft, FaBook, FaStar } from "react-icons/fa";
+import {
+  FaBookmark,
+  FaQuoteLeft,
+  FaBook,
+  FaStar,
+  FaChartLine,
+} from "react-icons/fa";
 import { Button } from "../components/ui/button";
 import {
   Accordion,
@@ -13,6 +19,7 @@ import {
 import Book, { type BookType } from "../models/Book";
 import { logoutUser } from "../services/auth.server";
 import BookCard from "~/components/BookCard";
+import User from "~/models/User";
 
 export async function loader({ request }: Route.LoaderArgs) {
   const user = await getAuthUser(request);
@@ -32,6 +39,49 @@ export default function ProfilePage({
   loaderData: { user: UserType; userBooks: BookType[] };
 }) {
   const { user, userBooks } = loaderData;
+  const submit = useSubmit();
+
+  const handleDeleteGoal = () => {
+    if (confirm("Are you sure you want to delete your reading goal?")) {
+      submit({ _action: "deleteGoal" }, { method: "post" });
+    }
+  };
+
+  // Format reading goal for display
+  const showReadingGoal = () => {
+    if (!user.readingGoal || !user.readingGoal.isActive) {
+      return (
+        <div className="text-center mb-6 p-4 border rounded-lg border-primary-beige shadow-sm">
+          <p className="mb-3">No reading goal set yet</p>
+          <Link to="/reading-goals">
+            <Button>Set a reading goal</Button>
+          </Link>
+        </div>
+      );
+    }
+
+    const { target, type, frequency } = user.readingGoal;
+
+    return (
+      <div className="mb-6 p-4 border rounded-lg border-primary-beige shadow-sm">
+        <div className="mb-3 flex items-center justify-center gap-2 text-xl font-bold">
+          <span>{target}</span>
+          <span>{type}</span>
+          <span>{frequency}</span>
+        </div>
+        <div className="flex justify-center gap-2">
+          <Link to="/reading-goals">
+            <Button size="sm" variant="outline">
+              Edit
+            </Button>
+          </Link>
+          <Button size="sm" variant="outline" onClick={handleDeleteGoal}>
+            Delete
+          </Button>
+        </div>
+      </div>
+    );
+  };
 
   return (
     <main className="flex flex-col items-center px-2 py-20 md:px-40 md:py-10 h-screen mx-4 lg:mx-60">
@@ -45,8 +95,26 @@ export default function ProfilePage({
         </div>
         <h1>{user.email}</h1>
       </div>
-      <div className="w-full mt-6">
-        <Accordion type="single" collapsible className="w-full md:w-1/2 mx-auto">
+
+      {/* Reading Goal displayed above accordion */}
+      <div className="w-full my-6 max-w-md mx-auto">
+        {user.readingGoal && user.readingGoal.isActive && (
+          <div className="flex items-center justify-between mb-2">
+            <h2 className="font-semibold flex items-center gap-2">
+              <FaChartLine />
+              Reading Goal
+            </h2>
+          </div>
+        )}
+        {showReadingGoal()}
+      </div>
+
+      <div className="w-full mt-2">
+        <Accordion
+          type="single"
+          collapsible
+          className="w-full md:w-1/2 mx-auto"
+        >
           <AccordionItem value="saved-books">
             <AccordionTrigger className="flex gap-2">
               <FaBookmark />
@@ -97,6 +165,7 @@ export default function ProfilePage({
         </Accordion>
       </div>
       <Form method="post">
+        <input type="hidden" name="_action" value="logout" />
         <Button className="mt-4" type="submit">
           Log Out
         </Button>
@@ -106,5 +175,29 @@ export default function ProfilePage({
 }
 
 export async function action({ request }: Route.ActionArgs) {
-  return logoutUser(request);
+  const userId = await getAuthUser(request);
+  if (!userId) {
+    throw redirect("/signin");
+  }
+
+  const formData = await request.formData();
+  const action = formData.get("_action") as string;
+
+  if (action === "deleteGoal") {
+    // Find user and remove reading goal
+    const user = await User.findById(userId);
+    if (user) {
+      user.readingGoal = {
+        type: "minutes",
+        frequency: "daily",
+        target: 0,
+        isActive: false,
+        createdAt: new Date(),
+      };
+      await user.save();
+    }
+    return null;
+  } else {
+    return logoutUser(request);
+  }
 }
