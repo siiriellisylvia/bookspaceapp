@@ -4,7 +4,7 @@ import { Button } from "~/components/ui/button";
 import { getAuthUser } from "~/services/auth.server";
 import type { Route } from "../+types/root";
 import User from "~/models/User";
-import { X } from "lucide-react";
+import { ChevronLeft} from "lucide-react";
 import {
   Select,
   SelectContent,
@@ -48,9 +48,9 @@ export default function ReadingGoalsPage({
           variant="ghost"
           size="icon"
           onClick={() => navigate(-1)}
-          className="rounded-full"
+          className="rounded-full md:hidden"
         >
-          <X />
+          <ChevronLeft />
         </Button>
       </div>
 

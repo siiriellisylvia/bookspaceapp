@@ -8,10 +8,11 @@ import {
   AiOutlineUp,
 } from "react-icons/ai"; // Star & book icons
 import { FaBookmark, FaRegBookmark, FaBookOpen, FaBook } from "react-icons/fa"; // Bookmark icons
+import { ChevronLeft } from "lucide-react"; // Import back arrow icon
 import BookCard from "~/components/BookCard";
 import { getRecommendedBooks } from "~/utils/getRecommendedBooks";
 import { useState } from "react";
-import { redirect, useFetcher, Link } from "react-router";
+import { redirect, useFetcher, Link, useNavigate } from "react-router";
 import { getAuthUser } from "~/services/auth.server";
 import { Button } from "~/components/ui/button";
 import Review from "~/models/Review";
@@ -118,9 +119,20 @@ export default function BookDetail({
   const [isDescriptionExpanded, setIsDescriptionExpanded] = useState(false);
   const maxChars = 250;
   const truncatedDescription = truncateText(book.description, maxChars);
+  const navigate = useNavigate();
 
   return (
     <div className="flex flex-col items-center px-2 py-20 md:p-10 max-w-3xl mx-auto">
+      <div className="w-full flex items-center mb-4">
+        <Button
+          variant="ghost"
+          size="icon"
+          onClick={() => navigate(-1)}
+          className="rounded-full md:hidden"
+        >
+          <ChevronLeft />
+        </Button>
+      </div>
       <div className="relative w-full max-w-sm">
         <img
           src={book.coverImage?.url}

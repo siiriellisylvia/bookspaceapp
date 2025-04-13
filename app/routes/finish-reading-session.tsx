@@ -5,7 +5,7 @@ import { authenticateUser } from "~/services/auth.server";
 import type { Route } from "../+types/root";
 import Book from "~/models/Book";
 import User from "~/models/User";
-import { X } from "lucide-react";
+import { ChevronLeft } from "lucide-react";
 import mongoose from "mongoose";
 
 export async function loader({ request, params }: Route.LoaderArgs) {
@@ -61,7 +61,7 @@ export default function FinishReadingSession({
   // Read the minutesRead from query parameter or sessionStorage
   useEffect(() => {
     // 1. First try to get the value from URL parameters
-    const minutesFromTimer = searchParams.get('minutesRead');
+    const minutesFromTimer = searchParams.get("minutesRead");
 
     // 2. If URL param doesn't exist or is invalid, try sessionStorage
     let minutesValue = null;
@@ -69,14 +69,13 @@ export default function FinishReadingSession({
       minutesValue = String(Number(minutesFromTimer));
     } else {
       try {
-        const storedMinutes = sessionStorage.getItem('minutesRead');
+        const storedMinutes = sessionStorage.getItem("minutesRead");
         if (storedMinutes && !isNaN(Number(storedMinutes))) {
           minutesValue = storedMinutes;
           // Clear the value from storage after using it
-          sessionStorage.removeItem('minutesRead');
+          sessionStorage.removeItem("minutesRead");
         }
-      } catch (e) {
-      }
+      } catch (e) {}
     }
 
     // 3. Update the state if we have a valid value
@@ -104,9 +103,9 @@ export default function FinishReadingSession({
           variant="ghost"
           size="icon"
           onClick={() => navigate(-1)}
-          className="rounded-full"
+          className="rounded-full md:hidden"
         >
-          <X />
+          <ChevronLeft />
         </Button>
       </div>
 
