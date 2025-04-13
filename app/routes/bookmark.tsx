@@ -27,22 +27,24 @@ export async function action({ request, params }: Route.ActionArgs) {
   const action = formData.get("action");
 
   let isBookmarked;
-  let isCurrentlyReading;
 
   if (action === "setCurrentlyReading") {
-    // Set status to 'reading' for the book
-    if (bookIndex !== -1) {
-      user.bookCollection[bookIndex].status = 'reading';
-      isCurrentlyReading = true;
-      isBookmarked = true;
+    // Just ensure the book is in the collection when the read button is clicked
+    if (bookIndex === -1) {
+      // If it's not already bookmarked, add it to the collection
+      user.bookCollection.push({
+        bookId: bookObjectId,
+        progress: 0,
+        status: 'bookmarked'
+      });
     }
+    isBookmarked = true;
   } else {
     // Handle bookmark/unbookmark
     if (bookIndex !== -1) {
       // Remove book from collection (Unbookmark)
       user.bookCollection.splice(bookIndex, 1);
       isBookmarked = false;
-      isCurrentlyReading = false;
     } else {
       // Add book to collection with default progress (Bookmark)
       user.bookCollection.push({
@@ -51,12 +53,11 @@ export async function action({ request, params }: Route.ActionArgs) {
         status: 'bookmarked'
       });
       isBookmarked = true;
-      isCurrentlyReading = false;
     }
   }
 
   await user.save();
 
-  // Return the updated state to the client
-  return Response.json({ isBookmarked, isCurrentlyReading });
+  // Return the updated bookmark state to the client
+  return Response.json({ isBookmarked });
 }
