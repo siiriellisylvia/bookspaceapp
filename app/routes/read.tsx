@@ -75,7 +75,7 @@ export default function ReadMode({
   };
 
   return (
-    <div className="flex flex-col gap-2 px-2 py-20 md:py-5 items-center justify-between h-screen">
+    <div className="flex flex-col gap-2 px-2 py-20 md:py-5 items-center h-screen">
       <div className="flex flex-row gap-2 items-center justify-between w-full">
         <Button
           variant="ghost"
@@ -96,8 +96,8 @@ export default function ReadMode({
         )}
       </div>
       <div className="flex flex-col gap-2 items-center justify-center w-full">
-        <p className="text-xl font-semibold font-sans mx-auto">Now reading</p>
-        <h1 className="text-2xl md:text-3xl font-bold text-center">
+        <p className="font-semibold font-sans mx-auto">Now reading</p>
+        <h1>
           {book.title}
         </h1>
         <img

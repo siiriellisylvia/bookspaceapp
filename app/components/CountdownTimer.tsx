@@ -138,101 +138,107 @@ const CountdownTimer = forwardRef<CountdownTimerHandle, CountdownTimerProps>(
     };
 
     return (
-      <div className="flex flex-col items-center justify-center gap-4">
-        {!isRunning && time === 0 && initialSeconds === 0 ? (
-          <>
-            <div className="w-full flex flex-col items-center gap-2">
-              <label htmlFor="minutes-input" className="text-sm">
-                Set reading time in minutes:
-              </label>
-              <Input
-                id="minutes-input"
-                type="text"
-                value={minutes}
-                onChange={handleMinutesChange}
-                className="w-24 text-center text-xl"
-                inputMode="numeric"
-                aria-label="Minutes"
-                maxLength={3}
-              />
-            </div>
-
-            <div className="flex justify-center gap-2 mt-2">
-              <Button
+      <div className="flex flex-col items-center justify-center gap-4 mt-1">
+        {!isRunning && time === 0 && initialSeconds > 0 ? (
+          // Timer completed state - show only the congratulatory message and button
+          <div className="flex flex-col items-center gap-4 text-center">
+            <h2>Well done, you've now read for {calculateElapsedMinutes()} minutes!</h2>
+            
+            {onFinishReading && (
+              <Button 
+                onClick={onFinishReading}
                 variant="outline"
-                size="sm"
-                onClick={() => handlePresetMinutes(15)}
-                className="px-3 py-1"
+                className="mt-4"
               >
-                15
+                Finish reading session
               </Button>
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={() => handlePresetMinutes(30)}
-                className="px-3 py-1"
-              >
-                30
-              </Button>
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={() => handlePresetMinutes(45)}
-                className="px-3 py-1"
-              >
-                45
-              </Button>
-            </div>
-          </>
-        ) : !isRunning && time === 0 && initialSeconds > 0 ? (
-          <>
-            <div className="flex flex-col items-center gap-4 text-center">
-              <h2 className="text-2xl font-semibold">Well done, you've now read for {calculateElapsedMinutes()} minutes!</h2>
-              
-              {onFinishReading && (
-                <Button 
-                  onClick={onFinishReading}
-                  variant="outline"
-                  className="mt-4"
-                >
-                  Finish reading session
-                </Button>
-              )}
-            </div>
-          </>
-        ) : (
-          <div className="text-5xl font-semibold tabular-nums">
-            {formatTime(time)}
+            )}
           </div>
-        )}
+        ) : (
+          // All other states - show the timer controls
+          <>
+            {!isRunning && time === 0 ? (
+              // Initial timer setup state
+              <>
+                <div className="w-full flex flex-col items-center gap-2">
+                  <label htmlFor="minutes-input" className="text-sm">
+                    Set reading time in minutes:
+                  </label>
+                  <Input
+                    id="minutes-input"
+                    type="text"
+                    value={minutes}
+                    onChange={handleMinutesChange}
+                    className="w-24 text-center text-xl"
+                    inputMode="numeric"
+                    aria-label="Minutes"
+                    maxLength={3}
+                  />
+                </div>
 
-        <button
-          className="rounded-full border-2 border-primary-beige p-4 w-16 h-16 flex items-center justify-center mt-4"
-          onClick={handleStartPause}
-          disabled={
-            !isRunning && (parseInt(minutes) <= 0 || isNaN(parseInt(minutes)))
-          }
-        >
-          {!isRunning && time === 0 ? "▶︎" : isRunning ? "⏸︎" : "▶︎"}
-        </button>
+                <div className="flex justify-center gap-2 mt-2">
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => handlePresetMinutes(15)}
+                    className="px-3 py-1"
+                  >
+                    15
+                  </Button>
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => handlePresetMinutes(30)}
+                    className="px-3 py-1"
+                  >
+                    30
+                  </Button>
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => handlePresetMinutes(45)}
+                    className="px-3 py-1"
+                  >
+                    45
+                  </Button>
+                </div>
+              </>
+            ) : (
+              // Timer running or paused state
+              <div className="text-5xl font-semibold tabular-nums">
+                {formatTime(time)}
+              </div>
+            )}
 
-        <div className="text-sm mb-1">
-          {isRunning
-            ? "Reading..."
-            : time > 0
-              ? "Reading paused"
-              : "Start reading timer"}
-        </div>
+            <button
+              className="rounded-full border-2 border-primary-beige p-4 w-16 h-16 flex items-center justify-center mt-4"
+              onClick={handleStartPause}
+              disabled={
+                !isRunning && (parseInt(minutes) <= 0 || isNaN(parseInt(minutes)))
+              }
+            >
+              {!isRunning && time === 0 ? "▶︎" : isRunning ? "⏸︎" : "▶︎"}
+            </button>
 
-        {(isRunning || time > 0) && (
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={resetTimer}
-            className="text-xs mt-1"
-          >
-            Delete timer
-          </Button>
+            <div className="text-sm mb-1">
+              {isRunning
+                ? "Reading..."
+                : time > 0
+                  ? "Reading paused"
+                  : "Start reading timer"}
+            </div>
+
+            {(isRunning || time > 0) && (
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={resetTimer}
+                className="text-xs mt-1"
+              >
+                Delete timer
+              </Button>
+            )}
+          </>
         )}
       </div>
     );
