@@ -233,40 +233,36 @@ export async function action({ request, params }: Route.ActionArgs) {
   );
 
   if (bookIndex === -1) {
-    // If the book is not in the collection, add it
-    const bookObjectId = new mongoose.Types.ObjectId(bookId);
-    user.bookCollection.push({
-      bookId: bookObjectId,
-      progress: pageNumber,
-      status: 'reading',
-      readingSessions: [
-        {
-          startTime: new Date(Date.now() - minutesRead * 60 * 1000), // Approximate start time
-          endTime: new Date(),
-          pagesRead: pageNumber,
-          minutesRead: minutesRead,
-        },
-      ],
-    });
-  } else {
-    // Add a new reading session to the existing book entry
-    user.bookCollection[bookIndex].readingSessions.push({
-      startTime: new Date(Date.now() - minutesRead * 60 * 1000), // Approximate start time
-      endTime: new Date(),
-      pagesRead: pageNumber - (user.bookCollection[bookIndex].progress || 0),
-      minutesRead: minutesRead,
-    });
-
-    // Update the overall progress to the current page
-    user.bookCollection[bookIndex].progress = pageNumber;
-    
-    // Update the status based on progress
-    if (pageNumber >= book.pageCount) {
-      user.bookCollection[bookIndex].status = 'finished';
-    } else {
-      user.bookCollection[bookIndex].status = 'reading';
-    }
+    // The book should already be in the collection at this point
+    // If not found, redirect to the book detail page with an error
+    return redirect(`/books/${bookId}?error=Book+not+in+collection`);
   }
+
+  // Get the current book entry
+  const bookEntry = user.bookCollection[bookIndex];
+  
+  // Check if this is the first reading session
+  const isFirstReadingSession = bookEntry.readingSessions.length === 0;
+  
+  // Add a new reading session to the existing book entry
+  bookEntry.readingSessions.push({
+    startTime: new Date(Date.now() - minutesRead * 60 * 1000), // Approximate start time
+    endTime: new Date(),
+    pagesRead: pageNumber - (bookEntry.progress || 0),
+    minutesRead: minutesRead,
+  });
+
+  // Update the overall progress to the current page
+  bookEntry.progress = pageNumber;
+  
+  // Update the status based on progress
+  if (pageNumber >= book.pageCount) {
+    bookEntry.status = 'finished';
+  } else if (isFirstReadingSession) {
+    // Only set to reading if this was the first reading session
+    bookEntry.status = 'reading';
+  }
+  // Otherwise, keep the existing status
 
   await user.save();
 
