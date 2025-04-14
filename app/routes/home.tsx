@@ -11,6 +11,8 @@ import {
   CarouselNext,
   CarouselPrevious,
 } from "~/components/ui/carousel";
+import { getPopularBooks, getRandomBooks } from "~/utils/getRecommendedBooks";
+import { Button } from "~/components/ui/button";
 
 export function meta({}: Route.MetaArgs) {
   return [
@@ -61,10 +63,21 @@ export async function loader({ request }: Route.LoaderArgs) {
         entry.book !== null &&
         entry.isBookmarked === true
     );
+    
+  // If user has no books in collection, get popular books
+  let popularBooks: BookType[] = [];
+  if (currentlyReading.length === 0 && bookmarkedBooks.length === 0) {
+    popularBooks = await getPopularBooks(6);
+  }
+
+  // Get random books for discovery
+  const randomBooks = await getRandomBooks(6);
 
   return Response.json({
     currentlyReading,
     bookmarkedBooks,
+    popularBooks,
+    randomBooks,
     userName: user.name || "Reader",
   });
 }
@@ -76,71 +89,146 @@ export default function Home({
     book: BookType;
     currentlyReading: { book: BookType; progress: number }[];
     bookmarkedBooks: { book: BookType; progress: number }[];
+    popularBooks: BookType[];
+    randomBooks: BookType[];
     userName: string;
   };
 }) {
-  const { currentlyReading, bookmarkedBooks, userName } = loaderData;
+  const { currentlyReading, bookmarkedBooks, popularBooks, randomBooks, userName } = loaderData;
+  const hasBooks = currentlyReading.length > 0 || bookmarkedBooks.length > 0;
 
   return (
     <div className="flex flex-col gap-4 px-2 py-20 md:py-10 items-center max-w-4xl mx-auto">
       <h1 className="text-2xl font-bold mb-4">Welcome back, {userName}!</h1>
-      <h2>Currently reading</h2>
-      {currentlyReading.length === 0 ? (
-        <p>No books in your collection yet.</p>
+      
+      {hasBooks ? (
+        <>
+          <h2>Currently reading</h2>
+          {currentlyReading.length === 0 ? (
+            <p>No books in your collection yet.</p>
+          ) : (
+            <Carousel
+              className="w-full"
+              opts={{
+                align: "start",
+                containScroll: "trimSnaps",
+                skipSnaps: false,
+              }}
+            >
+              <CarouselContent>
+                {currentlyReading.map((entry) =>
+                  entry.book ? (
+                    <CarouselItem
+                      key={entry.book._id.toString()}
+                      className="basis-1/3.5 lg:basis-1/4"
+                    >
+                      <BookCard book={entry.book} progress={entry.progress} />
+                    </CarouselItem>
+                  ) : null,
+                )}
+              </CarouselContent>
+              <CarouselPrevious />
+              <CarouselNext />
+            </Carousel>
+          )}
+          <h2>Bookmarked</h2>
+          {bookmarkedBooks.length === 0 ? (
+            <p>No bookmarked books yet.</p>
+          ) : (
+            <Carousel
+              className="w-full"
+              opts={{
+                align: "start",
+                containScroll: "trimSnaps",
+                skipSnaps: false,
+              }}
+            >
+              <CarouselContent>
+                {bookmarkedBooks.map((entry) =>
+                  entry.book ? (
+                    <CarouselItem
+                      key={entry.book._id.toString()}
+                      className="basis-1/3.5 lg:basis-1/4"
+                    >
+                      {/* Explicitly passing undefined for progress to ensure no progress bar is displayed */}
+                      <BookCard book={entry.book} progress={undefined} />
+                    </CarouselItem>
+                  ) : null,
+                )}
+              </CarouselContent>
+              <CarouselPrevious />
+              <CarouselNext />
+            </Carousel>
+          )}
+        </>
       ) : (
-        <Carousel
-          className="w-full"
-          opts={{
-            align: "start",
-            containScroll: "trimSnaps",
-            skipSnaps: false,
-          }}
-        >
-          <CarouselContent>
-            {currentlyReading.map((entry) =>
-              entry.book ? (
+        <>
+          <h2>Popular books</h2>
+          {popularBooks.length === 0 ? (
+            <p>No recommendations available at the moment.</p>
+          ) : (
+            <Carousel
+              className="w-full"
+              opts={{
+                align: "start",
+                containScroll: "trimSnaps",
+                skipSnaps: false,
+              }}
+            >
+              <CarouselContent>
+                {popularBooks.map((book) => (
+                  <CarouselItem
+                    key={book._id.toString()}
+                    className="basis-1/3.5 lg:basis-1/4"
+                  >
+                    <BookCard book={book} progress={undefined} />
+                  </CarouselItem>
+                ))}
+              </CarouselContent>
+              <CarouselPrevious />
+              <CarouselNext />
+            </Carousel>
+          )}
+          <p className="text-center mt-2">
+            Start adding books to your collection to keep track of your reading progress!
+          </p>
+          <Link to="/books" className="mt-2">
+            <Button variant="default">
+              See all books
+            </Button>
+          </Link>
+        </>
+      )}
+
+      {/* Discover new books section - always visible */}
+      <div className="w-full mt-4">
+        <h2>Discover new books</h2>
+        {randomBooks.length === 0 ? (
+          <p>No books available at the moment.</p>
+        ) : (
+          <Carousel
+            className="w-full"
+            opts={{
+              align: "start",
+              containScroll: "trimSnaps",
+              skipSnaps: false,
+            }}
+          >
+            <CarouselContent>
+              {randomBooks.map((book) => (
                 <CarouselItem
-                  key={entry.book._id.toString()}
+                  key={book._id.toString()}
                   className="basis-1/3.5 lg:basis-1/4"
                 >
-                  <BookCard book={entry.book} progress={entry.progress} />
+                  <BookCard book={book} progress={undefined} />
                 </CarouselItem>
-              ) : null,
-            )}
-          </CarouselContent>
-          <CarouselPrevious />
-          <CarouselNext />
-        </Carousel>
-      )}
-      <h2>Bookmarked</h2>
-      {bookmarkedBooks.length === 0 ? (
-        <p>No bookmarked books yet.</p>
-      ) : (
-        <Carousel
-          className="w-full"
-          opts={{
-            align: "start",
-            containScroll: "trimSnaps",
-            skipSnaps: false,
-          }}
-        >
-          <CarouselContent>
-            {bookmarkedBooks.map((entry) =>
-              entry.book ? (
-                <CarouselItem
-                  key={entry.book._id.toString()}
-                  className="basis-1/3.5 lg:basis-1/4"
-                >
-                  {/* Explicitly passing undefined for progress to ensure no progress bar is displayed */}
-                  <BookCard book={entry.book} progress={undefined} />
-                </CarouselItem>
-              ) : null,
-            )}
-          </CarouselContent>
-          <CarouselPrevious />
-          <CarouselNext />
-        </Carousel>
-      )}
+              ))}
+            </CarouselContent>
+            <CarouselPrevious />
+            <CarouselNext />
+          </Carousel>
+        )}
+      </div>
     </div>
   );
 }

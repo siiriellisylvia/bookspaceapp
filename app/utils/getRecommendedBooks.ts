@@ -78,3 +78,34 @@ export async function getRecommendedBooks(
 
   return result;
 }
+
+/**
+ * Fetches a list of random books from the database
+ * @param limit Number of books to fetch
+ * @returns Array of books
+ */
+export async function getRandomBooks(limit: number = 6): Promise<BookType[]> {
+  // Get random books from the database
+  const randomBooks = await Book.aggregate([
+    { $sample: { size: limit } } // Get random books
+  ]);
+
+  return randomBooks;
+}
+
+/**
+ * Fetches a list of popular books from the database (books with highest ratings)
+ * @param limit Number of books to fetch
+ * @returns Array of books
+ */
+export async function getPopularBooks(limit: number = 6): Promise<BookType[]> {
+  // Get books with the highest ratings
+  const popularBooks = await Book.aggregate([
+    { $match: { rating: { $gt: 0 } } },  // Only books with ratings
+    { $sort: { rating: -1, ratingsCount: -1 } }, // Sort by rating and then by number of ratings
+    { $limit: limit * 2 }, // Get more than we need to select randomly from
+    { $sample: { size: limit } } // Randomly select from top rated books
+  ]);
+
+  return popularBooks;
+}
