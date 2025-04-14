@@ -20,6 +20,12 @@ import {
   type ReadingPeriodData,
 } from "~/components/ReadingGoalChart";
 import { TestChart } from "../components/TestChart";
+import {
+  Tabs,
+  TabsList,
+  TabsTrigger,
+  TabsContent,
+} from "../components/ui/tabs";
 
 export async function loader({ request }: Route.LoaderArgs) {
   const currentUserId = await authenticateUser(request);
@@ -170,48 +176,56 @@ export default function Insights({
     loaderData;
 
   return (
-    <div className="container mx-auto py-20 px-4 md:px-40">
+    <div className="mx-auto py-20 px-4 md:px-40">
       <h1 className="mb-8 text-center">Reading insights</h1>
+      <Tabs defaultValue="weekly" className="w-full">
+        <TabsList className="w-full">
+          <TabsTrigger value="weekly">Weekly</TabsTrigger>
+          <TabsTrigger value="monthly">Monthly</TabsTrigger>
+          <TabsTrigger value="all-time">All time</TabsTrigger>
+        </TabsList>
+        <TabsContent value="all-time">
+          <div className="grid gap-4 md:grid-cols-2">
+            <Card>
+              <h2 className="text-center mb-1">Total reading time</h2>
+              <p className="text-3xl! font-bold text-center text-primary-burgundy">
+                {totalMinutesRead} minutes
+              </p>
+              <p className="text-center text-primary-beige mt-2">
+                That's approximately {Math.round(totalMinutesRead / 60)} hours
+                of reading!
+              </p>
+            </Card>
 
-      <div className="grid gap-6 md:grid-cols-2">
-        <Card className="p-6 bg-primary-dark text-primary-beige">
-          <h2 className="text-center mb-2">Total reading time</h2>
-          <p className="text-4xl font-bold text-center text-primary-burgundy">
-            {totalMinutesRead} minutes
-          </p>
-          <p className="text-center text-primary-beige mt-2">
-            That's approximately {Math.round(totalMinutesRead / 60)} hours of
-            reading!
-          </p>
-        </Card>
+            <Card className="p-6 bg-primary-dark text-primary-beige">
+              <h2 className="text-center mb-2">Books read</h2>
+              <p className="text-3xl! font-bold text-center text-primary-burgundy">
+                {totalBooksRead}
+              </p>
+              <p className="text-center text-muted-foreground mt-2">
+                Keep going to expand your reading journey!
+              </p>
+            </Card>
+          </div>
 
-        <Card className="p-6 bg-primary-dark text-primary-beige">
-          <h2 className="text-center mb-2">Books read</h2>
-          <p className="text-4xl font-bold text-center text-primary-burgundy">
-            {totalBooksRead}
-          </p>
-          <p className="text-center text-muted-foreground mt-2">
-            Keep going to expand your reading journey!
-          </p>
-        </Card>
-      </div>
-
-      {readingGoal &&
-        readingGoal.isActive &&
-        (readingGoal.type === "minutes" || readingGoal.type === "hours") &&
-        periodicReadingData.length > 0 && (
-          <Card className="mt-6 p-6 bg-transparent border border-primary-beige">
-            <h2 className="mb-4 text-center text-primary-beige">
-              Reading goal progress
-            </h2>
-            <p className="text-center text-muted-foreground mb-4">
-              Your goal: {readingGoal.target} {readingGoal.type}{" "}
-              {readingGoal.frequency}
-            </p>
-            <ReadingGoalChart data={periodicReadingData} />
-          </Card>
-        )}
-      <TestChart />
+          {readingGoal &&
+            readingGoal.isActive &&
+            (readingGoal.type === "minutes" || readingGoal.type === "hours") &&
+            periodicReadingData.length > 0 && (
+              <Card className="mt-6 p-6 bg-transparent border border-primary-beige">
+                <h2 className="mb-4 text-center text-primary-beige">
+                  Reading goal progress
+                </h2>
+                <p className="text-center text-muted-foreground mb-4">
+                  Your goal: {readingGoal.target} {readingGoal.type}{" "}
+                  {readingGoal.frequency}
+                </p>
+                <ReadingGoalChart data={periodicReadingData} />
+              </Card>
+            )}
+        </TabsContent>
+        <TabsContent value="monthly">Change your password here.</TabsContent>
+      </Tabs>
     </div>
   );
 }

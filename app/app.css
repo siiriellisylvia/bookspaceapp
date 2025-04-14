@@ -42,7 +42,7 @@ h1 {
 }
 
 h2 {
-  @apply text-xl lg:text-3xl;
+  @apply text-xl lg:text-3xl dark:text-primary-beige;
 }
 
 h3 {
