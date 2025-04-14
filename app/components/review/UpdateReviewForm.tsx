@@ -25,9 +25,9 @@ export default function UpdateReviewForm({
   useEffect(() => {
     // Scroll to the form when it's mounted
     if (formRef.current) {
-      formRef.current.scrollIntoView({ 
-        behavior: 'smooth', 
-        block: 'center'
+      formRef.current.scrollIntoView({
+        behavior: "smooth",
+        block: "center",
       });
     }
   }, []);
@@ -57,16 +57,10 @@ export default function UpdateReviewForm({
         <fetcher.Form method="post" action={`/books/${bookId}/review`}>
           <input type="hidden" name="reviewId" value={review._id} />
           <input type="hidden" name="rating" value={editContent.rating} />
-          <label className="font-semibold text-primary-beige">Edit</label>
-          <textarea
-            name="comment"
-            value={editContent.comment}
-            onChange={(e) =>
-              setEditContent({ ...editContent, comment: e.target.value })
-            }
-            className="w-full border p-2 rounded-md mt-2 text-primary-beige"
-          />
-          <div className="flex gap-1 justify-end mt-2">
+          <label className="font-semibold text-primary-beige">
+            Edit your review
+          </label>
+          <div className="flex gap-1 mt-2">
             {[1, 2, 3, 4, 5].map((num) => (
               <button
                 key={num}
@@ -82,20 +76,32 @@ export default function UpdateReviewForm({
               </button>
             ))}
           </div>
-          <div className="flex gap-2 mt-2">
-            <Button type="submit" name="action" value="updateReview">
-              Update
-            </Button>
+          <textarea
+            name="comment"
+            value={editContent.comment}
+            onChange={(e) =>
+              setEditContent({ ...editContent, comment: e.target.value })
+            }
+            className="w-full border p-2 rounded-md mt-4 text-primary-beige"
+          />
+
+          <div className="flex flex-col justify-end gap-2 mt-4">
+            <div className="flex gap-2 justify-end">
+              <Button type="submit" name="action" value="updateReview">
+                Update
+              </Button>
+              <Button type="button" variant="outline" onClick={onCancel}>
+                Cancel
+              </Button>
+            </div>
             <Button
               type="submit"
               name="action"
               value="deleteReview"
               variant="link"
+              className="flex justify-end"
             >
               Delete review
-            </Button>
-            <Button type="button" variant="outline" onClick={onCancel}>
-              Cancel
             </Button>
           </div>
         </fetcher.Form>
