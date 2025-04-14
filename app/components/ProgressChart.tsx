@@ -1,4 +1,3 @@
-import { TrendingUp } from "lucide-react";
 import {
   Label,
   PolarGrid,
@@ -13,7 +12,6 @@ import {
   CardDescription,
   CardFooter,
   CardHeader,
-  CardTitle,
 } from "../components/ui/card";
 import { type ChartConfig, ChartContainer } from "../components/ui/chart";
 
@@ -46,8 +44,12 @@ export function ProgressChart({ todayMinutes = 0, goalMinutes = 60, completionPe
   return (
     <Card className="flex flex-col">
       <CardHeader className="items-center pb-0">
-        <h2 className="text-center text-lg font-bold text-primary-burgundy">
-          Daily Reading Progress</h2>
+        <h2>Daily goal</h2>
+        <p className="text-sm">
+          {actualPercentage >= 100
+            ? "Well done, you've reached your goal today!"
+            : `You are ${actualPercentage}% of the way to your daily goal, keep going!`}
+        </p>
       </CardHeader>
       <CardContent className="flex-1 pb-0">
         <ChartContainer
@@ -57,7 +59,7 @@ export function ProgressChart({ todayMinutes = 0, goalMinutes = 60, completionPe
           <RadialBarChart
             data={chartData}
             startAngle={0}
-            endAngle={360}
+            endAngle={250}
             innerRadius={80}
             outerRadius={110}
           >
@@ -65,10 +67,10 @@ export function ProgressChart({ todayMinutes = 0, goalMinutes = 60, completionPe
               gridType="circle"
               radialLines={false}
               stroke="none"
-              className="first:fill-muted last:fill-primary-beige"
+              className="first:fill-primary-beige-10 last:fill-primary-dark"
               polarRadius={[86, 74]}
             />
-            <RadialBar dataKey="value" background cornerRadius={10} />
+            <RadialBar dataKey="value" background cornerRadius={10} className="fill-primary-beige"/>
             <PolarRadiusAxis tick={false} tickLine={false} axisLine={false}>
               <Label
                 content={({ viewBox }) => {
@@ -83,14 +85,14 @@ export function ProgressChart({ todayMinutes = 0, goalMinutes = 60, completionPe
                         <tspan
                           x={viewBox.cx}
                           y={viewBox.cy}
-                          className="fill-primary-dark text-4xl font-bold"
+                          className="fill-primary-beige text-4xl font-bold"
                         >
                           {todayMinutes}
                         </tspan>
                         <tspan
                           x={viewBox.cx}
                           y={(viewBox.cy || 0) + 24}
-                          className="fill-muted-foreground"
+                          className="fill-primary-beige"
                         >
                           of {goalMinutes} min
                         </tspan>
@@ -103,11 +105,6 @@ export function ProgressChart({ todayMinutes = 0, goalMinutes = 60, completionPe
           </RadialBarChart>
         </ChartContainer>
       </CardContent>
-      <CardFooter className="justify-center pt-0">
-        <p className="text-center text-sm text-muted-foreground">
-          {actualPercentage}% of daily goal completed
-        </p>
-      </CardFooter>
     </Card>
   );
 }

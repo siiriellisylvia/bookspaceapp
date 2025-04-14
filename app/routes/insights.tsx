@@ -242,6 +242,9 @@ export default function Insights({
         goalMinutes={dailyGoalMinutes} 
         completionPercentage={completionPercentage}
       />
+      <div className="mt-6 mb-4 flex items-center justify-between">
+        <h2 className="text-lg">Reading goal progress</h2>
+      </div>
       <Tabs defaultValue="weekly" className="w-full">
         <TabsList className="w-full">
           <TabsTrigger value="weekly">Weekly</TabsTrigger>
@@ -252,7 +255,7 @@ export default function Insights({
           <div className="grid gap-4 md:grid-cols-2">
             <Card>
               <h2 className="text-center mb-1">Total reading time</h2>
-              <p className="text-3xl! font-bold text-center text-primary-burgundy">
+              <p className="text-3xl! font-bold text-center">
                 {totalMinutesRead} minutes
               </p>
               <p className="text-center text-primary-beige mt-2">
@@ -261,12 +264,12 @@ export default function Insights({
               </p>
             </Card>
 
-            <Card className="p-6 bg-primary-dark text-primary-beige">
+            <Card className="p-6">
               <h2 className="text-center mb-2">Books read</h2>
-              <p className="text-3xl! font-bold text-center text-primary-burgundy">
+              <p className="text-3xl! font-bold text-center">
                 {totalBooksRead}
               </p>
-              <p className="text-center text-muted-foreground mt-2">
+              <p className="text-center mt-2">
                 Keep going to expand your reading journey!
               </p>
             </Card>
@@ -277,7 +280,7 @@ export default function Insights({
             (readingGoal.type === "minutes" || readingGoal.type === "hours") &&
             periodicReadingData.length > 0 && (
               <Card className="mt-6 p-6 bg-transparent border border-primary-beige">
-                <h2 className="mb-4 text-center text-primary-beige">
+                <h2 className="mb-4 text-center">
                   Reading goal progress
                 </h2>
                 <p className="text-center text-muted-foreground mb-4">
