@@ -110,7 +110,7 @@ export default function Home({
         }}
       >
         <CardContent className="relative z-10 p-6">
-          <h2 className="text-4xl! text-primary-burgundy!">Spring is here!</h2>
+          <h2 className="text-3xl! text-primary-burgundy!">Spring is here!</h2>
           <p className="bg-primary-beige-80 mt-4 bg-primary-burgundy-80 p-2 rounded-md inline-block text-primary-burgundy!">
             Discover the new books that are blooming this season. Whether you're
             looking for a new adventure or a cozy read, we've got you covered.
