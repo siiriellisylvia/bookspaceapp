@@ -4,8 +4,22 @@ import User from "~/models/User";
 import Book from "~/models/Book";
 import { Card } from "~/components/ui/card";
 import { redirect } from "react-router";
-import { addDays, format, isWithinInterval, startOfDay, startOfMonth, startOfWeek, subDays, subMonths, subWeeks } from "date-fns";
-import { ReadingGoalChart, type ReadingPeriodData } from "~/components/ReadingGoalChart";
+import {
+  addDays,
+  format,
+  isWithinInterval,
+  startOfDay,
+  startOfMonth,
+  startOfWeek,
+  subDays,
+  subMonths,
+  subWeeks,
+} from "date-fns";
+import {
+  ReadingGoalChart,
+  type ReadingPeriodData,
+} from "~/components/ReadingGoalChart";
+import { TestChart } from "../components/TestChart";
 
 export async function loader({ request }: Route.LoaderArgs) {
   const currentUserId = await authenticateUser(request);
@@ -58,9 +72,15 @@ export async function loader({ request }: Route.LoaderArgs) {
 
   // Only include reading goals comparison chart if a goal exists and is for minutes or hours
   let periodicReadingData: ReadingPeriodData[] = [];
-  if (readingGoal && (readingGoal.type === "minutes" || readingGoal.type === "hours")) {
+  if (
+    readingGoal &&
+    (readingGoal.type === "minutes" || readingGoal.type === "hours")
+  ) {
     // Normalize goal to minutes if the goal is in hours
-    const goalInMinutes = readingGoal.type === "hours" ? readingGoal.target * 60 : readingGoal.target;
+    const goalInMinutes =
+      readingGoal.type === "hours"
+        ? readingGoal.target * 60
+        : readingGoal.target;
 
     // Calculate intervals based on frequency
     const intervals = [];
@@ -176,11 +196,14 @@ export default function Insights({
         </Card>
       </div>
 
-      {readingGoal && readingGoal.isActive &&
+      {readingGoal &&
+        readingGoal.isActive &&
         (readingGoal.type === "minutes" || readingGoal.type === "hours") &&
         periodicReadingData.length > 0 && (
           <Card className="mt-6 p-6 bg-transparent border border-primary-beige">
-            <h2 className="mb-4 text-center text-primary-beige">Reading goal progress</h2>
+            <h2 className="mb-4 text-center text-primary-beige">
+              Reading goal progress
+            </h2>
             <p className="text-center text-muted-foreground mb-4">
               Your goal: {readingGoal.target} {readingGoal.type}{" "}
               {readingGoal.frequency}
@@ -188,6 +211,7 @@ export default function Insights({
             <ReadingGoalChart data={periodicReadingData} />
           </Card>
         )}
+      <TestChart />
     </div>
   );
 }

@@ -3,11 +3,14 @@ import {
   Bar,
   XAxis,
   YAxis,
-  CartesianGrid,
-  Tooltip,
   ReferenceLine,
 } from "recharts";
-import { ChartContainer, ChartLegend, ChartTooltip, ChartTooltipContent } from "~/components/ui/chart";
+import {
+  ChartContainer,
+  ChartLegend,
+  ChartTooltip,
+  ChartTooltipContent,
+} from "~/components/ui/chart";
 
 // Define types for our chart data
 export type ReadingPeriodData = {
@@ -27,29 +30,32 @@ export function ReadingGoalChart({ data }: ReadingGoalChartProps) {
   const chartConfig = {
     actual: {
       label: "Minutes Read",
-      color: "var(--chart-2)",
-    },
-    goal: {
-      label: "Goal",
       color: "var(--chart-1)",
-    },
+    }
+
   };
 
   return (
-    <ChartContainer config={chartConfig} className="h-80">
-      <BarChart
-        data={data}
-        margin={{ top: 20, right: 30, left: 20, bottom: 5 }}
+    <ChartContainer
+      config={chartConfig}
+      className="h-auto"
+    >
+      <BarChart 
+        data={data} 
+        margin={{ top: 10, right: 30, left: 0, bottom: 5 }}
       >
-        <CartesianGrid horizontal={false} vertical={false} />
-        <XAxis dataKey="period" tickLine={false} axisLine={false} />
-        <YAxis
-          tickLine={false}
+
+        <XAxis 
+          dataKey="period" 
+          tickLine={false} 
+          axisLine={false} 
+        />
+        <YAxis 
+          tickLine={false} 
           axisLine={false}
-          tickFormatter={(value) => `${value}m`}
+          tick={false}
         />
         <ChartTooltip content={<ChartTooltipContent />} />
-        <ChartLegend />
         {/* Add a horizontal reference line for the goal */}
         <ReferenceLine
           y={goalValue}
