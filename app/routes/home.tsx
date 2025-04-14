@@ -98,7 +98,7 @@ export default function Home({
   const hasBooks = currentlyReading.length > 0 || bookmarkedBooks.length > 0;
 
   return (
-    <div className="flex flex-col gap-4 px-2 py-20 md:py-10 items-center max-w-4xl mx-auto">
+    <div className="flex flex-col gap-4 px-4 py-20 md:py-10 items-center max-w-4xl mx-auto">
       <h1 className="text-2xl font-bold mb-4">Welcome, {userName}!</h1>
       <Card
         className="w-full mb-4 overflow-hidden"
@@ -109,7 +109,7 @@ export default function Home({
           position: "relative",
         }}
       >
-        <CardContent className="relative p-6 ml-auto w-1/2">
+        <CardContent className="relative w-1/2 ml-auto">
           <h2 className="w-1/3 text-3xl! text-primary-burgundy!">
             Spring favourites
           </h2>

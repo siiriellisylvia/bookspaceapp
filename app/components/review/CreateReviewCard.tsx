@@ -45,12 +45,7 @@ export default function CreateReviewCard({
           <label className="font-semibold text-primary-beige ">
             Write a review
           </label>
-          <textarea
-            name="comment"
-            placeholder="Write your review..."
-            className="w-full border p-2 rounded-md mt-2 text-primary-beige"
-          />
-          <div className="flex gap-1 justify-start mt-2">
+          <div className="flex gap-1 justify-end mt-2">
             {[1, 2, 3, 4, 5].map((num) => (
               <button
                 key={num}
@@ -66,9 +61,18 @@ export default function CreateReviewCard({
               </button>
             ))}
           </div>
+          <textarea
+            name="comment"
+            placeholder="Write your review..."
+            className="w-full border p-2 rounded-md mt-2 text-primary-burgundy dark:text-primary-beige"
+          />
+
           <input type="hidden" name="rating" value={rating} />
-          <div className="flex gap-2 mt-2">
-            <Button type="submit">Submit Review</Button>
+          <div className="flex gap-2 justify-end mt-4">
+            <Button type="submit">Submit review</Button>
+            <Button type="button" variant="outline" onClick={onCancel}>
+              Cancel
+            </Button>
           </div>
         </fetcher.Form>
       </CardContent>

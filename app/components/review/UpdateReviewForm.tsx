@@ -72,16 +72,28 @@ export default function UpdateReviewForm({
     });
   };
 
+  // Format the date
+  const formattedDate = review.createdAt 
+    ? new Date(review.createdAt).toLocaleDateString('en-US', {
+        year: 'numeric',
+        month: 'short',
+        day: 'numeric'
+      })
+    : 'Unknown date';
+
   return (
     <Card className="mb-3 p-4 shadow-sm w-full" ref={formRef}>
       <CardContent>
         <fetcher.Form method="post" action={`/books/${bookId}/review`}>
           <input type="hidden" name="reviewId" value={review._id} />
           <input type="hidden" name="rating" value={editContent.rating} />
-          <label className="font-semibold text-primary-beige">
-            Edit your review
-          </label>
-          <div className="flex gap-1 mt-2">
+          <div className="flex justify-between items-center">
+            <label className="font-semibold text-primary-beige">
+              Edit your review
+            </label>
+            <span className="text-xs text-primary-beige-80">Posted: {formattedDate}</span>
+          </div>
+          <div className="flex gap-1 mt-2 justify-end">
             {[1, 2, 3, 4, 5].map((num) => (
               <button
                 key={num}

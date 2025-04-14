@@ -17,13 +17,25 @@ export default function ReviewCard({
   // Determine if this review was written by the current user
   const isOwner = review.user._id.toString() === currentUser;
 
+  // Format the date
+  const formattedDate = review.createdAt 
+    ? new Date(review.createdAt).toLocaleDateString('en-US', {
+        year: 'numeric',
+        month: 'short',
+        day: 'numeric'
+      })
+    : 'Unknown date';
+
   return (
     <Card key={review._id} className="mb-3 p-4 shadow-sm">
       <CardContent>
         <div className="flex items-center gap-4">
           <div className="size-10 rounded-full bg-primary-beige" />
           <div className="flex flex-col gap-2">
-            <p className="font-semibold">{review.user.name}</p>
+            <div className="flex items-start flex-col gap-2">
+              <p className="font-semibold">{review.user.name}</p>
+              <span className="text-xs text-primary-burgundy dark:text-primary-beige-80">{formattedDate}</span>
+            </div>
             <div className="flex gap-2 text-primary-burgundy dark:text-primary-beige">
               {/* Create an array with length equal to review.rating and map over it */}
               {[...Array(review.rating)].map((_, i) => (
