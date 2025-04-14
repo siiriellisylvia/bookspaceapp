@@ -26,6 +26,7 @@ import {
   TabsTrigger,
   TabsContent,
 } from "../components/ui/tabs";
+import { ProgressChart } from "~/components/ProgressChart";
 
 export async function loader({ request }: Route.LoaderArgs) {
   const currentUserId = await authenticateUser(request);
@@ -75,6 +76,51 @@ export async function loader({ request }: Route.LoaderArgs) {
 
   // Prepare data for the goal vs. actual chart
   const today = new Date();
+
+  // Calculate today's reading progress
+  const todayStart = startOfDay(today);
+  const todayEnd = addDays(todayStart, 1);
+  
+  // Sum all reading sessions within today
+  const todayMinutesRead = user.bookCollection.reduce((total, bookEntry) => {
+    const sessionMinutes = bookEntry.readingSessions.reduce(
+      (subtotal, session) => {
+        if (
+          session.startTime &&
+          isWithinInterval(new Date(session.startTime), { 
+            start: todayStart, 
+            end: todayEnd 
+          })
+        ) {
+          return subtotal + (session.minutesRead || 0);
+        }
+        return subtotal;
+      },
+      0,
+    );
+    return total + sessionMinutes;
+  }, 0);
+  
+  // Calculate daily goal in minutes
+  let dailyGoalMinutes = 0;
+  if (readingGoal && readingGoal.isActive) {
+    // Convert goal to minutes if needed
+    dailyGoalMinutes = readingGoal.type === 'hours' 
+      ? readingGoal.target * 60 
+      : (readingGoal.type === 'minutes' ? readingGoal.target : 0);
+      
+    // Adjust goal based on frequency
+    if (readingGoal.frequency === 'weekly') {
+      dailyGoalMinutes = Math.round(dailyGoalMinutes / 7);
+    } else if (readingGoal.frequency === 'monthly') {
+      dailyGoalMinutes = Math.round(dailyGoalMinutes / 30);
+    }
+  }
+  
+  // Calculate completion percentage
+  const completionPercentage = dailyGoalMinutes > 0 
+    ? Math.round((todayMinutesRead / dailyGoalMinutes) * 100) 
+    : 0;
 
   // Only include reading goals comparison chart if a goal exists and is for minutes or hours
   let periodicReadingData: ReadingPeriodData[] = [];
@@ -154,6 +200,9 @@ export async function loader({ request }: Route.LoaderArgs) {
     totalBooksRead: sortedBooks.length,
     readingGoal,
     periodicReadingData,
+    todayMinutesRead,
+    dailyGoalMinutes,
+    completionPercentage,
   });
 }
 
@@ -170,14 +219,29 @@ export default function Insights({
       isActive: boolean;
     } | null;
     periodicReadingData: ReadingPeriodData[];
+    todayMinutesRead: number;
+    dailyGoalMinutes: number;
+    completionPercentage: number;
   };
 }) {
-  const { totalMinutesRead, totalBooksRead, readingGoal, periodicReadingData } =
-    loaderData;
+  const { 
+    totalMinutesRead, 
+    totalBooksRead, 
+    readingGoal, 
+    periodicReadingData,
+    todayMinutesRead,
+    dailyGoalMinutes,
+    completionPercentage
+  } = loaderData;
 
   return (
     <div className="mx-auto py-20 px-4 md:px-40">
       <h1 className="mb-8 text-center">Reading insights</h1>
+      <ProgressChart 
+        todayMinutes={todayMinutesRead} 
+        goalMinutes={dailyGoalMinutes} 
+        completionPercentage={completionPercentage}
+      />
       <Tabs defaultValue="weekly" className="w-full">
         <TabsList className="w-full">
           <TabsTrigger value="weekly">Weekly</TabsTrigger>
