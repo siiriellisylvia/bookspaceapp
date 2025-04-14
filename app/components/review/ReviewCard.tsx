@@ -1,7 +1,7 @@
 import { Card, CardContent } from "~/components/ui/card";
 import { AiFillStar } from "react-icons/ai";
-import { FaThumbsUp, FaThumbsDown, FaEdit } from "react-icons/fa";
 import { Button } from "~/components/ui/button";
+import { PencilLine } from "lucide-react";
 
 export default function ReviewCard({
   review,
@@ -18,36 +18,30 @@ export default function ReviewCard({
   const isOwner = review.user._id.toString() === currentUser;
 
   return (
-    <Card key={review._id} className="mb-3 p-4 shadow-sm bg-transparent">
+    <Card key={review._id} className="mb-3 p-4 shadow-sm">
       <CardContent>
-        <div className="flex items-center gap-3">
-          <div className="size-10 rounded-full bg-gray-200" />
-          <div>
+        <div className="flex items-center gap-4">
+          <div className="size-10 rounded-full bg-primary-beige" />
+          <div className="flex flex-col gap-2">
             <p className="font-semibold">{review.user.name}</p>
-            <div className="flex gap-1 text-primary-burgundy dark:text-primary-beige">
+            <div className="flex gap-2 text-primary-burgundy dark:text-primary-beige">
               {/* Create an array with length equal to review.rating and map over it */}
               {[...Array(review.rating)].map((_, i) => (
-                <AiFillStar key={i} size={16} />
+                <AiFillStar key={i} size={20} />
               ))}
             </div>
           </div>
         </div>
-        <p className="mt-2 text-gray-700">{review.comment}</p>
+        <p className="mt-2 text-primary-beige-80">{review.comment}</p>
         <div className="flex items-center gap-4 mt-2">
-          <button className="text-gray-500 hover:text-blue-500 flex items-center gap-1">
-            <FaThumbsUp size={16} /> 12
-          </button>
-          <button className="text-gray-500 hover:text-red-500 flex items-center gap-1">
-            <FaThumbsDown size={16} /> 3
-          </button>
           {isOwner && (
             <Button
               type="button"
-              variant="outline"
+              variant="default"
               onClick={() => onEdit(review)}
-              className="ml-auto flex items-center gap-1"
+              className="ml-auto flex items-center gap-3"
             >
-              <FaEdit size={16} />
+              <PencilLine size={16} />
               Edit
             </Button>
           )}

@@ -1,9 +1,8 @@
-import { useState } from "react";
+import { useState, useRef, useEffect } from "react";
 import { useFetcher } from "react-router";
 import { Card, CardContent } from "~/components/ui/card";
 import { Button } from "~/components/ui/button";
 import { AiFillStar, AiOutlineStar } from "react-icons/ai";
-import { useEffect } from "react";
 
 export default function CreateReviewCard({
   bookId,
@@ -17,6 +16,17 @@ export default function CreateReviewCard({
   const [comment, setComment] = useState("");
   const [rating, setRating] = useState(0);
   const fetcher = useFetcher();
+  const formRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    // Scroll to the form when it's mounted
+    if (formRef.current) {
+      formRef.current.scrollIntoView({
+        behavior: "smooth",
+        block: "center",
+      });
+    }
+  }, []);
 
   useEffect(() => {
     console.log("Fetcher state:", fetcher.state, "Fetcher data:", fetcher.data);
@@ -26,8 +36,9 @@ export default function CreateReviewCard({
       onCancel();
     }
   }, [fetcher.data, onCancel, onCreate]);
+
   return (
-    <Card className="mb-3 p-4 shadow-sm bg-transparent w-full">
+    <Card className="mb-3 p-4 shadow-sm bg-transparent w-full" ref={formRef}>
       <CardContent>
         <fetcher.Form method="post" action={`/books/${bookId}/review`}>
           <input type="hidden" name="action" value="createReview" />
@@ -39,7 +50,6 @@ export default function CreateReviewCard({
             placeholder="Write your review..."
             className="w-full border p-2 rounded-md mt-2 text-primary-beige"
           />
-          {/* NEW: Star rating selector, following updateReview pattern */}
           <div className="flex gap-1 justify-start mt-2">
             {[1, 2, 3, 4, 5].map((num) => (
               <button
@@ -58,9 +68,7 @@ export default function CreateReviewCard({
           </div>
           <input type="hidden" name="rating" value={rating} />
           <div className="flex gap-2 mt-2">
-            <Button type="submit">
-              Submit Review
-            </Button>
+            <Button type="submit">Submit Review</Button>
           </div>
         </fetcher.Form>
       </CardContent>

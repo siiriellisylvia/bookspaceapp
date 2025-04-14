@@ -255,10 +255,10 @@ export async function action({ request, params }: Route.ActionArgs) {
 
   // Get the current book entry
   const bookEntry = user.bookCollection[bookIndex];
-  
+
   // Check if this is the first reading session
   const isFirstReadingSession = bookEntry.readingSessions.length === 0;
-  
+
   // Add a new reading session to the existing book entry
   bookEntry.readingSessions.push({
     startTime: new Date(Date.now() - minutesRead * 60 * 1000), // Approximate start time
@@ -269,13 +269,13 @@ export async function action({ request, params }: Route.ActionArgs) {
 
   // Update the overall progress to the current page
   bookEntry.progress = pageNumber;
-  
+
   // Update the status based on progress
   if (pageNumber >= book.pageCount) {
-    bookEntry.status = 'finished';
+    bookEntry.status = "finished";
   } else if (isFirstReadingSession) {
     // Only set to reading if this was the first reading session
-    bookEntry.status = 'reading';
+    bookEntry.status = "reading";
   }
   // Otherwise, keep the existing status
 

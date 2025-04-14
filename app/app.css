@@ -19,6 +19,8 @@
   --color-primary-beige-20: rgb(216, 204, 187, 0.2);
   --color-black: #101010;
   --color-white: #f4f2f0;
+  --color-primary-destructive: #81372E;
+  --color-primary-destructive-90: rgb(129, 55, 46, 0.9);
 }
 
 html,
