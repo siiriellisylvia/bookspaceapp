@@ -13,6 +13,8 @@ import {
 } from "~/components/ui/carousel";
 import { getPopularBooks, getRandomBooks } from "~/utils/getRecommendedBooks";
 import { Button } from "~/components/ui/button";
+import { Card, CardContent } from "~/components/ui/card";
+import springBgImage from "~/assets/spring-bg.png";
 
 export function meta({}: Route.MetaArgs) {
   return [
@@ -45,11 +47,7 @@ export async function loader({ request }: Route.LoaderArgs) {
       progress: entry.progress || 0,
       status: entry.status || "not_started",
     }))
-    .filter(
-      (entry) =>
-        entry.book !== null &&
-        entry.status === "reading"
-    );
+    .filter((entry) => entry.book !== null && entry.status === "reading");
 
   // Books that are bookmarked (using isBookmarked flag)
   const bookmarkedBooks = user.bookCollection
@@ -58,12 +56,8 @@ export async function loader({ request }: Route.LoaderArgs) {
       progress: entry.progress || 0,
       isBookmarked: entry.isBookmarked || false,
     }))
-    .filter(
-      (entry) =>
-        entry.book !== null &&
-        entry.isBookmarked === true
-    );
-    
+    .filter((entry) => entry.book !== null && entry.isBookmarked === true);
+
   // If user has no books in collection, get popular books
   let popularBooks: BookType[] = [];
   if (currentlyReading.length === 0 && bookmarkedBooks.length === 0) {
@@ -94,13 +88,36 @@ export default function Home({
     userName: string;
   };
 }) {
-  const { currentlyReading, bookmarkedBooks, popularBooks, randomBooks, userName } = loaderData;
+  const {
+    currentlyReading,
+    bookmarkedBooks,
+    popularBooks,
+    randomBooks,
+    userName,
+  } = loaderData;
   const hasBooks = currentlyReading.length > 0 || bookmarkedBooks.length > 0;
 
   return (
     <div className="flex flex-col gap-4 px-2 py-20 md:py-10 items-center max-w-4xl mx-auto">
-      <h1 className="text-2xl font-bold mb-4">Welcome back, {userName}!</h1>
-      
+      <h1 className="text-2xl font-bold mb-4">Welcome, {userName}!</h1>
+      <Card
+        className="w-full mb-4 overflow-hidden"
+        style={{
+          backgroundImage: `url(${springBgImage})`,
+          backgroundSize: "cover",
+          backgroundPosition: "center",
+          position: "relative",
+        }}
+      >
+        <CardContent className="relative z-10 p-6">
+          <h2 className="text-4xl! text-primary-burgundy!">Spring is here!</h2>
+          <p className="bg-primary-beige-80 mt-4 bg-primary-burgundy-80 p-2 rounded-md inline-block text-primary-burgundy!">
+            Discover the new books that are blooming this season. Whether you're
+            looking for a new adventure or a cozy read, we've got you covered.
+          </p>
+        </CardContent>
+      </Card>
+
       {hasBooks ? (
         <>
           <h2>Currently reading</h2>
@@ -190,12 +207,11 @@ export default function Home({
             </Carousel>
           )}
           <p className="text-center mt-2">
-            Start adding books to your collection to keep track of your reading progress!
+            Start adding books to your collection to keep track of your reading
+            progress!
           </p>
           <Link to="/books" className="mt-2">
-            <Button variant="default">
-              See all books
-            </Button>
+            <Button variant="default">See all books</Button>
           </Link>
         </>
       )}
