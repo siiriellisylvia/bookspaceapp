@@ -1,9 +1,11 @@
 import type { Route } from "../+types/root";
-import { authenticateUser} from "~/services/auth.server";
+import { authenticateUser } from "~/services/auth.server";
 import User from "~/models/User";
 import Book from "~/models/Book";
 import { Card } from "~/components/ui/card";
 import { redirect } from "react-router";
+import { addDays, format, isWithinInterval, startOfDay, startOfMonth, startOfWeek, subDays, subMonths, subWeeks } from "date-fns";
+import { ReadingGoalChart, type ReadingPeriodData } from "~/components/ReadingGoalChart";
 
 export async function loader({ request }: Route.LoaderArgs) {
   const currentUserId = await authenticateUser(request);
@@ -48,9 +50,84 @@ export async function loader({ request }: Route.LoaderArgs) {
     .filter((book) => book.minutes > 0) // Only include books with reading time
     .sort((a, b) => b.minutes - a.minutes);
 
+  // Get reading goal data (or null if no goal exists)
+  const readingGoal = user.readingGoal || null;
+
+  // Prepare data for the goal vs. actual chart
+  const today = new Date();
+
+  // Only include reading goals comparison chart if a goal exists and is for minutes or hours
+  let periodicReadingData: ReadingPeriodData[] = [];
+  if (readingGoal && (readingGoal.type === "minutes" || readingGoal.type === "hours")) {
+    // Normalize goal to minutes if the goal is in hours
+    const goalInMinutes = readingGoal.type === "hours" ? readingGoal.target * 60 : readingGoal.target;
+
+    // Calculate intervals based on frequency
+    const intervals = [];
+    if (readingGoal.frequency === "daily") {
+      // Last 7 days
+      for (let i = 6; i >= 0; i--) {
+        const date = subDays(today, i);
+        intervals.push({
+          start: startOfDay(date),
+          end: addDays(startOfDay(date), 1),
+          label: format(date, "EEE"),
+        });
+      }
+    } else if (readingGoal.frequency === "weekly") {
+      // Last 4 weeks
+      for (let i = 3; i >= 0; i--) {
+        const start = startOfWeek(subWeeks(today, i));
+        intervals.push({
+          start,
+          end: addDays(start, 7),
+          label: `Week ${4 - i}`,
+        });
+      }
+    } else if (readingGoal.frequency === "monthly") {
+      // Last 6 months
+      for (let i = 5; i >= 0; i--) {
+        const date = subMonths(today, i);
+        intervals.push({
+          start: startOfMonth(date),
+          end: startOfMonth(addDays(date, 32)),
+          label: format(date, "MMM"),
+        });
+      }
+    }
+
+    // Calculate actual reading minutes for each interval
+    periodicReadingData = intervals.map((interval) => {
+      // Sum all reading sessions within this interval
+      const minutesRead = user.bookCollection.reduce((total, bookEntry) => {
+        const sessionMinutes = bookEntry.readingSessions.reduce(
+          (subtotal, session) => {
+            if (
+              session.startTime &&
+              isWithinInterval(new Date(session.startTime), interval)
+            ) {
+              return subtotal + (session.minutesRead || 0);
+            }
+            return subtotal;
+          },
+          0,
+        );
+        return total + sessionMinutes;
+      }, 0);
+
+      return {
+        period: interval.label,
+        actual: minutesRead,
+        goal: goalInMinutes,
+      };
+    });
+  }
+
   return Response.json({
     totalMinutesRead,
     totalBooksRead: sortedBooks.length,
+    readingGoal,
+    periodicReadingData,
   });
 }
 
@@ -59,20 +136,27 @@ export default function Insights({
 }: {
   loaderData: {
     totalMinutesRead: number;
-    topBooks: { title: string; author: string; minutes: number }[];
     totalBooksRead: number;
+    readingGoal: {
+      type: string;
+      frequency: string;
+      target: number;
+      isActive: boolean;
+    } | null;
+    periodicReadingData: ReadingPeriodData[];
   };
 }) {
-    const { totalMinutesRead, totalBooksRead } = loaderData;
-
+  const { totalMinutesRead, totalBooksRead, readingGoal, periodicReadingData } =
+    loaderData;
 
   return (
-    <div className="container mx-auto py-20 px-2">
+    <div className="container mx-auto py-20 px-4 md:px-40">
       <h1 className="mb-8 text-center">Reading insights</h1>
 
-      <Card className="bg-primary-dark text-primary-beige">
+      <div className="grid gap-6 md:grid-cols-2">
+        <Card className="p-6 bg-primary-dark text-primary-beige">
           <h2 className="text-center mb-2">Total reading time</h2>
-          <p className="text-4xl! font-bold text-center text-primary-burgundy">
+          <p className="text-4xl font-bold text-center text-primary-burgundy">
             {totalMinutesRead} minutes
           </p>
           <p className="text-center text-primary-beige mt-2">
@@ -81,16 +165,29 @@ export default function Insights({
           </p>
         </Card>
 
-        <Card className="bg-primary-dark text-primary-beige mt-2">
+        <Card className="p-6 bg-primary-dark text-primary-beige">
           <h2 className="text-center mb-2">Books read</h2>
-          <p className="text-4xl! font-bold text-center text-primary-burgundy">
+          <p className="text-4xl font-bold text-center text-primary-burgundy">
             {totalBooksRead}
           </p>
           <p className="text-center text-muted-foreground mt-2">
             Keep going to expand your reading journey!
           </p>
         </Card>
+      </div>
 
+      {readingGoal && readingGoal.isActive &&
+        (readingGoal.type === "minutes" || readingGoal.type === "hours") &&
+        periodicReadingData.length > 0 && (
+          <Card className="mt-6 p-6 bg-transparent border border-primary-beige">
+            <h2 className="mb-4 text-center text-primary-beige">Reading goal progress</h2>
+            <p className="text-center text-muted-foreground mb-4">
+              Your goal: {readingGoal.target} {readingGoal.type}{" "}
+              {readingGoal.frequency}
+            </p>
+            <ReadingGoalChart data={periodicReadingData} />
+          </Card>
+        )}
     </div>
   );
 }
