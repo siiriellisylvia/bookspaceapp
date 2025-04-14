@@ -11,7 +11,7 @@ import {
   CarouselNext,
   CarouselPrevious,
 } from "~/components/ui/carousel";
-import { getPopularBooks, getRandomBooks } from "~/utils/getRecommendedBooks";
+import { getPopularBooks, getBooksByMoods } from "~/utils/getBooks";
 import { Button } from "~/components/ui/button";
 import { Card, CardContent } from "~/components/ui/card";
 import springBgImage from "~/assets/spring-bg-books.png";
@@ -64,14 +64,15 @@ export async function loader({ request }: Route.LoaderArgs) {
     popularBooks = await getPopularBooks(6);
   }
 
-  // Get random books for discovery
-  const randomBooks = await getRandomBooks(6);
+  // Get spring-themed books with specific moods for the seasonal recommendations
+  const springMoods = ["lighthearted", "inspiring", "funny", "hopeful"];
+  const seasonalBooks = await getBooksByMoods(springMoods, 6);
 
   return Response.json({
     currentlyReading,
     bookmarkedBooks,
     popularBooks,
-    randomBooks,
+    seasonalBooks,
     userName: user.name || "Reader",
   });
 }
@@ -84,7 +85,7 @@ export default function Home({
     currentlyReading: { book: BookType; progress: number }[];
     bookmarkedBooks: { book: BookType; progress: number }[];
     popularBooks: BookType[];
-    randomBooks: BookType[];
+    seasonalBooks: BookType[];
     userName: string;
   };
 }) {
@@ -92,7 +93,7 @@ export default function Home({
     currentlyReading,
     bookmarkedBooks,
     popularBooks,
-    randomBooks,
+    seasonalBooks,
     userName,
   } = loaderData;
   const hasBooks = currentlyReading.length > 0 || bookmarkedBooks.length > 0;
@@ -110,7 +111,7 @@ export default function Home({
         }}
       >
         <CardContent className="relative w-1/2 ml-auto">
-          <h2 className="w-1/3 text-2xl! text-primary-burgundy!">
+          <h2 className="w-1/3 md:w/2 text-2xl! text-primary-burgundy!">
             Spring favourites
           </h2>
         </CardContent>
@@ -119,7 +120,7 @@ export default function Home({
       {/* Discover new books section - always visible */}
       <div className="w-full">
         <h2 className="mb-2 text-center">Discover books for the season</h2>
-        {randomBooks.length === 0 ? (
+        {seasonalBooks.length === 0 ? (
           <p>No books available at the moment.</p>
         ) : (
           <Carousel
@@ -131,7 +132,7 @@ export default function Home({
             }}
           >
             <CarouselContent>
-              {randomBooks.map((book) => (
+              {seasonalBooks.map((book) => (
                 <CarouselItem
                   key={book._id.toString()}
                   className="basis-1/3.5 lg:basis-1/4"

@@ -10,7 +10,7 @@ import {
 import { FaBookmark, FaRegBookmark, FaBookOpen, FaBook } from "react-icons/fa"; // Bookmark icons
 import { ChevronLeft } from "lucide-react"; // Import back arrow icon
 import BookCard from "~/components/BookCard";
-import { getRecommendedBooks } from "~/utils/getRecommendedBooks";
+import { getRecommendedBooks } from "~/utils/getBooks";
 import { useState } from "react";
 import { redirect, useFetcher, Link, useNavigate } from "react-router";
 import { getAuthUser } from "~/services/auth.server";

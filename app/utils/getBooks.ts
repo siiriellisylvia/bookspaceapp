@@ -109,3 +109,27 @@ export async function getPopularBooks(limit: number = 6): Promise<BookType[]> {
 
   return popularBooks;
 }
+
+/**
+ * Fetches a list of books matching specific moods
+ * @param moods Array of moods to match against
+ * @param limit Number of books to fetch
+ * @returns Array of books matching at least one of the specified moods
+ */
+export async function getBooksByMoods(
+  moods: string[] = ["lighthearted", "inspiring", "funny", "hopeful"],
+  limit: number = 6
+): Promise<BookType[]> {
+  // Get books that match any of the specified moods
+  const moodBooks = await Book.aggregate([
+    { $match: { moods: { $in: moods } } }, // Match books that have at least one of the specified moods
+    { $addFields: { 
+      moodMatchCount: { $size: { $setIntersection: ["$moods", moods] } } // Count matching moods
+    }},
+    { $sort: { moodMatchCount: -1, rating: -1 } }, // Sort by number of matching moods, then by rating
+    { $limit: limit * 2 }, // Get more than we need to select randomly from
+    { $sample: { size: limit } } // Randomly select from the filtered books
+  ]);
+
+  return moodBooks;
+}
