@@ -23,10 +23,11 @@ const userSchema = new Schema(
       {
         bookId: { type: Schema.Types.ObjectId, ref: "Book" },
         progress: { type: Number, default: 0 },
+        isBookmarked: { type: Boolean, default: false },
         status: { 
           type: String, 
-          enum: ['bookmarked', 'reading', 'finished'], 
-          default: 'bookmarked' 
+          enum: ['not_started', 'reading', 'finished'], 
+          default: 'not_started' 
         },
         readingSessions: [{
           startTime: { type: Date, default: null },

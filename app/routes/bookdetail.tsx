@@ -33,16 +33,16 @@ export async function loader({ request, params }: Route.LoaderArgs) {
   const bookCollectionEntry = currentUser.bookCollection.find(
     (entry) => entry.bookId?.toString() === book._id.toString(),
   );
-  const isBookmarked = !!bookCollectionEntry;
+  const isBookmarked = bookCollectionEntry?.isBookmarked || false;
+  const readingStatus = bookCollectionEntry?.status || "not_started";
   const hasReadingSessions =
     (bookCollectionEntry?.readingSessions || []).length > 0;
   const progress = bookCollectionEntry?.progress || 0;
   const progressPercent =
     progress && book.pageCount ? (progress / book.pageCount) * 100 : 0;
-  const bookStatus = bookCollectionEntry?.status || null;
-  const isFinished = bookStatus === "finished";
-
-  console.log("hasReadingSessions", hasReadingSessions);
+  const isFinished = readingStatus === "finished";
+  const isReading = readingStatus === "reading";
+  const isInCollection = !!bookCollectionEntry;
 
   const recommendedBooks = await getRecommendedBooks(book);
 
@@ -72,12 +72,14 @@ export async function loader({ request, params }: Route.LoaderArgs) {
     reviews: processedReviews,
     userHasReviewed,
     isBookmarked,
+    readingStatus,
+    isReading,
     progress,
     hasReadingSessions,
     progressPercent,
     currentUser,
-    bookStatus,
     isFinished,
+    isInCollection,
   });
 }
 
@@ -100,28 +102,32 @@ export default function BookDetail({
     book: BookType;
     recommendedBooks: BookType[];
     isBookmarked: boolean;
+    readingStatus: string;
+    isReading: boolean;
     reviews: any[];
     userHasReviewed: boolean;
     currentUser: UserType;
     progress: number;
     hasReadingSessions: boolean;
     progressPercent: number;
-    bookStatus: string | null;
     isFinished: boolean;
+    isInCollection: boolean;
   };
 }) {
   const {
     book,
     recommendedBooks,
     isBookmarked,
+    readingStatus,
+    isReading,
     reviews,
     userHasReviewed,
     currentUser,
     progress,
     hasReadingSessions,
     progressPercent,
-    bookStatus,
     isFinished,
+    isInCollection,
   } = loaderData;
   const fetcher = useFetcher();
   const [isDescriptionExpanded, setIsDescriptionExpanded] = useState(false);
@@ -147,7 +153,7 @@ export default function BookDetail({
           alt={book.title}
           className="w-1/2 md:w-full rounded-lg shadow-lg mx-auto"
         />
-        {isBookmarked && hasReadingSessions && (
+        {isInCollection && hasReadingSessions && (
           <div className="mt-2">
             <div className="w-1/2 md:w-full mx-auto bg-primary-beige dark:bg-primary-beige-20 rounded-full h-2">
               <div
@@ -169,18 +175,20 @@ export default function BookDetail({
         by {book.author.join(", ")}
       </h2>
 
-      <div className="flex items-center gap-6 mt-4 text-primary-beige">
-        <div className="flex items-center gap-1">
-          <AiOutlineStar size={20} className="text-primary-beige" />
-          <span className="text-sm md:text-lg">{book.rating.toFixed(1)}</span>
+      <div className="flex flex-col items-center gap-4 mt-4">
+        <div className="flex items-center gap-6 text-primary-beige">
+          <div className="flex items-center gap-1">
+            <AiOutlineStar size={20} className="text-primary-beige" />
+            <span className="text-sm md:text-lg">{book.rating.toFixed(1)}</span>
+          </div>
+          <div className="flex items-center gap-1">
+            <AiOutlineBook size={20} />
+            <span className="text-sm md:text-lg">{book.pageCount}</span>
+          </div>
+          <div className="text-sm md:text-lg">{book.genres[0]}</div>
         </div>
-        <div className="flex items-center gap-1">
-          <AiOutlineBook size={20} />
-          <span className="text-sm md:text-lg">{book.pageCount}</span>
-        </div>
-        <div className="text-sm md:text-lg">{book.genres[0]}</div>
 
-        <div className="flex gap-2">
+        <div className="flex gap-2 mt-2">
           <fetcher.Form method="post" action={`/books/${book._id}/bookmark`}>
             <Button
               type="submit"
@@ -196,14 +204,15 @@ export default function BookDetail({
               {isBookmarked ? "" : "Bookmark"}
             </Button>
           </fetcher.Form>
-          {isBookmarked && !isFinished && (
+
+          {!isFinished && (
             <Link to={`/books/${book._id}/read`}>
               <Button
                 variant="default"
                 className="flex items-center gap-2 text-xs md:text-lg"
                 onClick={() => {
                   // Set status to reading when clicking the read button
-                  if (!hasReadingSessions) {
+                  if (!isReading) {
                     fetcher.submit(
                       { action: "setCurrentlyReading" },
                       { method: "post", action: `/books/${book._id}/bookmark` },
@@ -211,12 +220,12 @@ export default function BookDetail({
                   }
                 }}
               >
-                {hasReadingSessions ? (
+                {hasReadingSessions || isReading ? (
                   <FaBookOpen size={20} />
                 ) : (
                   <FaBook size={20} />
                 )}
-                {hasReadingSessions ? "Continue" : "Read"}
+                {hasReadingSessions || isReading ? "Continue" : "Read"}
               </Button>
             </Link>
           )}

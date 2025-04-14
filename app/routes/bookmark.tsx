@@ -26,38 +26,51 @@ export async function action({ request, params }: Route.ActionArgs) {
   const formData = await request.formData();
   const action = formData.get("action");
 
-  let isBookmarked;
-
-  if (action === "setCurrentlyReading") {
-    // Just ensure the book is in the collection when the read button is clicked
-    if (bookIndex === -1) {
-      // If it's not already bookmarked, add it to the collection
-      user.bookCollection.push({
-        bookId: bookObjectId,
-        progress: 0,
-        status: 'bookmarked'
-      });
-    }
-    isBookmarked = true;
-  } else {
-    // Handle bookmark/unbookmark
-    if (bookIndex !== -1) {
-      // Remove book from collection (Unbookmark)
-      user.bookCollection.splice(bookIndex, 1);
-      isBookmarked = false;
+  if (bookIndex !== -1) {
+    // Book is already in the collection
+    if (action === "setCurrentlyReading") {
+      // Update status to reading
+      user.bookCollection[bookIndex].status = "reading";
     } else {
-      // Add book to collection with default progress (Bookmark)
-      user.bookCollection.push({
-        bookId: bookObjectId,
-        progress: 0,
-        status: 'bookmarked'
-      });
-      isBookmarked = true;
+      // Toggle bookmark status
+      user.bookCollection[bookIndex].isBookmarked = !user.bookCollection[bookIndex].isBookmarked;
+      
+      // Check if we should remove the book from collection
+      const shouldRemove = !user.bookCollection[bookIndex].isBookmarked && 
+                           user.bookCollection[bookIndex].status === "not_started" && 
+                           user.bookCollection[bookIndex].progress === 0 &&
+                           (!user.bookCollection[bookIndex].readingSessions || 
+                            user.bookCollection[bookIndex].readingSessions.length === 0);
+      
+      if (shouldRemove) {
+        user.bookCollection.splice(bookIndex, 1);
+      }
     }
+  } else {
+    // Book is not in the collection, add it
+    const newEntry = {
+      bookId: bookObjectId,
+      progress: 0,
+      isBookmarked: action !== "setCurrentlyReading",
+      status: action === "setCurrentlyReading" ? "reading" : "not_started",
+      readingSessions: []
+    };
+    
+    user.bookCollection.push(newEntry);
   }
 
   await user.save();
 
-  // Return the updated bookmark state to the client
-  return Response.json({ isBookmarked });
+  // Find the current state after updates
+  const updatedUser = await User.findById(authUserId);
+  const updatedBookEntry = updatedUser?.bookCollection.find(
+    (entry) => entry.bookId?.toString() === bookId
+  );
+  
+  // Return the updated state to the client
+  return Response.json({
+    isBookmarked: updatedBookEntry?.isBookmarked || false,
+    readingStatus: updatedBookEntry?.status || "not_started",
+    inCollection: !!updatedBookEntry
+  });
 }
