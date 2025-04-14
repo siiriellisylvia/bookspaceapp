@@ -110,7 +110,7 @@ export default function Home({
         }}
       >
         <CardContent className="relative w-1/2 ml-auto">
-          <h2 className="w-1/3 text-3xl! text-primary-burgundy!">
+          <h2 className="w-1/3 text-2xl! text-primary-burgundy!">
             Spring favourites
           </h2>
         </CardContent>

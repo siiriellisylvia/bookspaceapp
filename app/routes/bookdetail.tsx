@@ -171,7 +171,7 @@ export default function BookDetail({
       <h1 className="text-2xl md:text-3xl font-bold text-center mt-4">
         {book.title}
       </h1>
-      <h2 className="text-lg dark:text-primary-beige">
+      <h2 className="dark:text-primary-beige-80!">
         by {book.author.join(", ")}
       </h2>
 
@@ -194,7 +194,7 @@ export default function BookDetail({
               type="submit"
               variant="default"
               disabled={fetcher.state !== "idle"}
-              className="text-xs md:text-lg"
+              className="text-xs md:text-sm"
             >
               {isBookmarked ? (
                 <FaBookmark size={24} />
@@ -209,7 +209,7 @@ export default function BookDetail({
             <Link to={`/books/${book._id}/read`}>
               <Button
                 variant="default"
-                className="flex items-center gap-2 text-xs md:text-lg"
+                className="flex items-center gap-2 text-xs md:text-sm"
                 onClick={() => {
                   // Set status to reading when clicking the read button
                   if (!isReading) {
