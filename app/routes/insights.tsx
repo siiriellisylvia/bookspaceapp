@@ -258,7 +258,7 @@ export default function Insights({
               <p className="text-3xl! font-bold text-center">
                 {totalMinutesRead} minutes
               </p>
-              <p className="text-center text-primary-beige mt-2">
+              <p className="text-center mt-2">
                 That's approximately {Math.round(totalMinutesRead / 60)} hours
                 of reading!
               </p>
@@ -283,7 +283,7 @@ export default function Insights({
                 <h2 className="mb-4 text-center">
                   Reading goal progress
                 </h2>
-                <p className="text-center text-muted-foreground mb-4">
+                <p className="text-center mb-4">
                   Your goal: {readingGoal.target} {readingGoal.type}{" "}
                   {readingGoal.frequency}
                 </p>

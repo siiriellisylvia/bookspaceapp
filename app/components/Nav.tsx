@@ -18,7 +18,7 @@ export default function NavBar() {
 
 export function MobileNav() {
   return (
-    <nav className="fixed bg-primary-dark bottom-0 left-0 flex flex-row gap-10 align-center justify-center w-full h-auto py-4 text-xs z-10">
+    <nav className="fixed bg-white dark:bg-primary-dark bottom-0 left-0 flex flex-row gap-10 align-center justify-center w-full h-auto py-4 text-xs z-10">
       <NavLink
         to="/"
         className="flex flex-col items-center justify-center gap-1"
