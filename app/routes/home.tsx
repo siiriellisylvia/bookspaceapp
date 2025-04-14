@@ -41,7 +41,7 @@ export async function loader({ request }: Route.LoaderArgs) {
     .map((entry) => ({
       book: entry.bookId || null,
       progress: entry.progress || 0,
-      status: entry.status || "bookmarked",
+      status: entry.status || "not_started",
     }))
     .filter(
       (entry) =>
@@ -49,17 +49,17 @@ export async function loader({ request }: Route.LoaderArgs) {
         entry.status === "reading"
     );
 
-  // Books with status "bookmarked"
+  // Books that are bookmarked (using isBookmarked flag)
   const bookmarkedBooks = user.bookCollection
     .map((entry) => ({
       book: entry.bookId || null,
       progress: entry.progress || 0,
-      status: entry.status || "bookmarked",
+      isBookmarked: entry.isBookmarked || false,
     }))
     .filter(
       (entry) =>
         entry.book !== null &&
-        entry.status === "bookmarked"
+        entry.isBookmarked === true
     );
 
   return Response.json({
@@ -131,6 +131,7 @@ export default function Home({
                   key={entry.book._id.toString()}
                   className="basis-1/3.5 lg:basis-1/4"
                 >
+                  {/* Explicitly passing undefined for progress to ensure no progress bar is displayed */}
                   <BookCard book={entry.book} progress={undefined} />
                 </CarouselItem>
               ) : null,
