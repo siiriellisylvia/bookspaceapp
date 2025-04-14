@@ -279,7 +279,7 @@ export default function Insights({
             readingGoal.isActive &&
             (readingGoal.type === "minutes" || readingGoal.type === "hours") &&
             periodicReadingData.length > 0 && (
-              <Card className="mt-6 p-6 bg-transparent border border-primary-beige">
+              <Card>
                 <h2 className="mb-4 text-center">
                   Reading goal progress
                 </h2>

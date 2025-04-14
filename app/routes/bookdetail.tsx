@@ -148,10 +148,10 @@ export default function BookDetail({
           className="w-1/2 md:w-full rounded-lg shadow-lg mx-auto"
         />
         {isBookmarked && hasReadingSessions && (
-          <div className="mt-4">
-            <div className="w-1/2 mx-auto md:w-full bg-primary-beige rounded-full h-2">
+          <div className="mt-2">
+            <div className="w-1/2 md:w-full mx-auto bg-primary-beige dark:bg-primary-beige-20 rounded-full h-2">
               <div
-                className="bg-primary-blue h-2 rounded-full"
+                className="bg-primary-burgundy dark:bg-primary-beige h-2 rounded-full"
                 style={{ width: `${progressPercent}%` }}
               />
             </div>

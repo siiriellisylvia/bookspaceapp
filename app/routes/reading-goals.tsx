@@ -61,7 +61,7 @@ export default function ReadingGoalsPage({
         <div className="flex flex-col gap-8 flex-1">
           <section className="flex flex-col gap-4 mx-auto">
             <div className="text-center mb-8">
-              <h1 className="text-3xl font-bold">What's Your Reading Goal?</h1>
+              <h1>What's your reading goal?</h1>
               <p className="mt-4 text-lg">
                 Whether it's finishing a book every week or diving deep into a
                 long series, choose your reading goals, and we'll help you get
@@ -78,7 +78,7 @@ export default function ReadingGoalsPage({
                   setTarget((prev) => String(Math.max(1, Number(prev) - 10)))
                 }
                 disabled={Number(target) <= 10}
-                className="rounded-full h-16 w-16"
+                className="rounded-full h-12 w-12"
               >
                 -10
               </Button>
@@ -92,14 +92,14 @@ export default function ReadingGoalsPage({
                     setTarget(value);
                   }
                 }}
-                className="w-20 text-center text-6xl border-none focus:outline-none [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+                className="w-20 text-center text-4xl border-none focus:outline-none [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
                 min="1"
               />
               <Button
                 type="button"
                 variant="outline"
                 onClick={() => setTarget((prev) => String(Number(prev) + 10))}
-                className="rounded-full h-16 w-16"
+                className="rounded-full h-12 w-12"
               >
                 +10
               </Button>

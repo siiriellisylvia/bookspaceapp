@@ -25,9 +25,9 @@ export default function BookCard({
       />
       {progress !== undefined && (
         <div className="my-2">
-          <div className="w-full bg-primary-beige rounded-full h-2">
+          <div className="w-full bg-primary-beige dark:bg-primary-beige-20 rounded-full h-2">
             <div
-              className="bg-primary-blue h-2 rounded-full"
+              className="bg-primary-burgundy dark:bg-primary-beige h-2 rounded-full"
               style={{ width: `${progressPercent}%` }}
             />
           </div>

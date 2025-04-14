@@ -6,8 +6,8 @@ import type { Route } from "../+types/root";
 import Book from "~/models/Book";
 import User from "~/models/User";
 import { ChevronLeft } from "lucide-react";
-import { Card } from "~/components/ui/card";
-import { Separator } from "@radix-ui/react-select";
+import { Card, CardContent } from "~/components/ui/card";
+import { Separator } from "~/components/ui/separator";
 
 export async function loader({ request, params }: Route.LoaderArgs) {
   const currentUserId = await authenticateUser(request);
@@ -126,6 +126,7 @@ export default function FinishReadingSession({
               <Button
                 type="button"
                 variant="outline"
+                className="rounded-full h-12 w-12"
                 onClick={() =>
                   setPageNumber((prev) =>
                     String(Math.max(1, Number(prev) - 10)),
@@ -153,6 +154,7 @@ export default function FinishReadingSession({
               <Button
                 type="button"
                 variant="outline"
+                className="rounded-full h-12 w-12"
                 onClick={() =>
                   setPageNumber((prev) =>
                     String(Math.min(book.pageCount, Number(prev) + 10)),
@@ -168,31 +170,40 @@ export default function FinishReadingSession({
 
           {/* Reading details section */}
           <Card>
-            <div className="flex flex-row gap-4 text-sm justify-between">
-              <label className="block text-sm font-medium">Reading time</label>
-              <div className="flex flex-row gap-2">
-                <input
-                  type="number"
-                  name="minutesRead"
-                  value={minutesRead}
-                  onChange={(e) => setMinutesRead(e.target.value)}
-                  min="1"
-                  className="w-16 text-center border-none bg-transparent focus:outline-none"
-                />
-                minutes
+            <CardContent className="pt-6 space-y-4">
+              <div className="flex flex-row gap-4 text-sm justify-between">
+                <label className="block text-sm font-medium">
+                  Reading time
+                </label>
+                <div className="flex flex-row gap-2">
+                  <input
+                    type="number"
+                    name="minutesRead"
+                    value={minutesRead}
+                    onChange={(e) => setMinutesRead(e.target.value)}
+                    min="1"
+                    className="w-16 text-center border-none bg-transparent focus:outline-none"
+                  />
+                  minutes
+                </div>
               </div>
-            </div>
-            <Separator/>
-            <div>
-              <p>Date</p>
-              <div>{formattedDate}, {formattedTime}</div>
-            </div>
-            <Separator/>
 
-            <div className="flex justify-between text-sm">
-              <div>Started at page</div>
-              <div>{initialPageNumber}</div>
-            </div>
+              <Separator />
+
+              <div className="flex justify-between text-sm">
+                <div>Date & Time</div>
+                <div>
+                  {formattedDate}, {formattedTime}
+                </div>
+              </div>
+
+              <Separator />
+
+              <div className="flex justify-between text-sm">
+                <div>Started at page</div>
+                <div>{initialPageNumber}</div>
+              </div>
+            </CardContent>
           </Card>
 
           {/* Spacer to push button to bottom when needed */}

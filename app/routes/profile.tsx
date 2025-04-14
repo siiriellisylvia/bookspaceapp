@@ -20,6 +20,7 @@ import Book, { type BookType } from "../models/Book";
 import { logoutUser } from "../services/auth.server";
 import BookCard from "~/components/BookCard";
 import User from "~/models/User";
+import { Card } from "~/components/ui/card";
 
 export async function loader({ request }: Route.LoaderArgs) {
   const user = await getAuthUser(request);
@@ -51,19 +52,19 @@ export default function ProfilePage({
   const showReadingGoal = () => {
     if (!user.readingGoal || !user.readingGoal.isActive) {
       return (
-        <div className="text-center mb-6 p-4 border rounded-lg border-primary-beige shadow-sm">
+        <Card>
           <p className="mb-3">No reading goal set yet</p>
           <Link to="/reading-goals">
             <Button>Set a reading goal</Button>
           </Link>
-        </div>
+        </Card>
       );
     }
 
     const { target, type, frequency } = user.readingGoal;
 
     return (
-      <div className="mb-6 p-4 border rounded-lg border-primary-beige shadow-sm">
+      <Card>
         <div className="mb-3 flex items-center justify-center gap-2 text-xl font-bold">
           <span>{target}</span>
           <span>{type}</span>
@@ -79,7 +80,7 @@ export default function ProfilePage({
             Delete
           </Button>
         </div>
-      </div>
+      </Card>
     );
   };
 
