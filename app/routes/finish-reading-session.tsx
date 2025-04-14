@@ -6,7 +6,8 @@ import type { Route } from "../+types/root";
 import Book from "~/models/Book";
 import User from "~/models/User";
 import { ChevronLeft } from "lucide-react";
-import mongoose from "mongoose";
+import { Card } from "~/components/ui/card";
+import { Separator } from "@radix-ui/react-select";
 
 export async function loader({ request, params }: Route.LoaderArgs) {
   const currentUserId = await authenticateUser(request);
@@ -166,8 +167,8 @@ export default function FinishReadingSession({
           </section>
 
           {/* Reading details section */}
-          <section className="flex flex-col gap-6 p-5 rounded-lg border border-primary-beige dark:border-primary-beige">
-            <div className="flex flex-row gap-4 text-sm w-full justify-between">
+          <Card>
+            <div className="flex flex-row gap-4 text-sm justify-between">
               <label className="block text-sm font-medium">Reading time</label>
               <div className="flex flex-row gap-2">
                 <input
@@ -181,15 +182,18 @@ export default function FinishReadingSession({
                 minutes
               </div>
             </div>
-            <div className="flex justify-between text-sm border-t border-primary-beige dark:border-primary-beige pt-3">
-              <div>Date</div>
-              <div>{formattedDate}</div>
+            <Separator/>
+            <div>
+              <p>Date</p>
+              <div>{formattedDate}, {formattedTime}</div>
             </div>
+            <Separator/>
+
             <div className="flex justify-between text-sm">
-              <div>Time</div>
-              <div>{formattedTime}</div>
+              <div>Started at page</div>
+              <div>{initialPageNumber}</div>
             </div>
-          </section>
+          </Card>
 
           {/* Spacer to push button to bottom when needed */}
           <div className="flex-grow"></div>
