@@ -39,6 +39,8 @@ export function ProgressChart({ todayMinutes = 0, goalMinutes = 60, completionPe
     },
   } satisfies ChartConfig;
 
+  const remainingMinutes = goalMinutes - todayMinutes;
+
   return (
     <Card className="flex flex-col">
       <CardHeader className="items-center pb-0">
@@ -46,7 +48,7 @@ export function ProgressChart({ todayMinutes = 0, goalMinutes = 60, completionPe
         <p className="text-sm">
           {actualPercentage >= 100
             ? "Well done, you've reached your goal today!"
-            : `You are ${actualPercentage}% of the way to your daily goal, keep going!`}
+            : `You are just ${remainingMinutes} minutes away from your daily goal, keep going!`}
         </p>
       </CardHeader>
       <CardContent className="flex-1 pb-0">
@@ -98,6 +100,7 @@ export function ProgressChart({ todayMinutes = 0, goalMinutes = 60, completionPe
             </text>
           </RadialBarChart>
         </ChartContainer>
+        <p className="text-center">{todayMinutes} minutes out of {goalMinutes} minutes read today</p>
       </CardContent>
     </Card>
   );
