@@ -14,7 +14,7 @@ import {
 import { getPopularBooks, getRandomBooks } from "~/utils/getRecommendedBooks";
 import { Button } from "~/components/ui/button";
 import { Card, CardContent } from "~/components/ui/card";
-import springBgImage from "~/assets/spring-bg.png";
+import springBgImage from "~/assets/spring-bg-books.png";
 
 export function meta({}: Route.MetaArgs) {
   return [
@@ -109,14 +109,42 @@ export default function Home({
           position: "relative",
         }}
       >
-        <CardContent className="relative z-10 p-6">
-          <h2 className="text-3xl! text-primary-burgundy!">Spring is here!</h2>
-          <p className="bg-primary-beige-80 mt-4 bg-primary-burgundy-80 p-2 rounded-md inline-block text-primary-burgundy!">
-            Discover the new books that are blooming this season. Whether you're
-            looking for a new adventure or a cozy read, we've got you covered.
-          </p>
+        <CardContent className="relative p-6 ml-auto w-1/2">
+          <h2 className="w-1/3 text-3xl! text-primary-burgundy!">
+            Spring favourites
+          </h2>
         </CardContent>
       </Card>
+
+      {/* Discover new books section - always visible */}
+      <div className="w-full">
+        <h2 className="mb-2 text-center">Discover books for the season</h2>
+        {randomBooks.length === 0 ? (
+          <p>No books available at the moment.</p>
+        ) : (
+          <Carousel
+            className="w-full"
+            opts={{
+              align: "start",
+              containScroll: "trimSnaps",
+              skipSnaps: false,
+            }}
+          >
+            <CarouselContent>
+              {randomBooks.map((book) => (
+                <CarouselItem
+                  key={book._id.toString()}
+                  className="basis-1/3.5 lg:basis-1/4"
+                >
+                  <BookCard book={book} progress={undefined} />
+                </CarouselItem>
+              ))}
+            </CarouselContent>
+            <CarouselPrevious />
+            <CarouselNext />
+          </Carousel>
+        )}
+      </div>
 
       {hasBooks ? (
         <>
@@ -215,36 +243,6 @@ export default function Home({
           </Link>
         </>
       )}
-
-      {/* Discover new books section - always visible */}
-      <div className="w-full mt-4">
-        <h2>Discover new books</h2>
-        {randomBooks.length === 0 ? (
-          <p>No books available at the moment.</p>
-        ) : (
-          <Carousel
-            className="w-full"
-            opts={{
-              align: "start",
-              containScroll: "trimSnaps",
-              skipSnaps: false,
-            }}
-          >
-            <CarouselContent>
-              {randomBooks.map((book) => (
-                <CarouselItem
-                  key={book._id.toString()}
-                  className="basis-1/3.5 lg:basis-1/4"
-                >
-                  <BookCard book={book} progress={undefined} />
-                </CarouselItem>
-              ))}
-            </CarouselContent>
-            <CarouselPrevious />
-            <CarouselNext />
-          </Carousel>
-        )}
-      </div>
     </div>
   );
 }
