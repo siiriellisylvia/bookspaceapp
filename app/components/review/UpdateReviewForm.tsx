@@ -3,6 +3,16 @@ import { useState, useEffect, useRef } from "react";
 import { Card, CardContent } from "~/components/ui/card";
 import { AiFillStar, AiOutlineStar } from "react-icons/ai";
 import { Button } from "~/components/ui/button";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "~/components/ui/alert-dialog";
 
 export default function UpdateReviewForm({
   review,
@@ -21,6 +31,7 @@ export default function UpdateReviewForm({
     comment: review.comment,
     rating: review.rating,
   });
+  const [showDeleteDialog, setShowDeleteDialog] = useState(false);
 
   useEffect(() => {
     // Scroll to the form when it's mounted
@@ -50,6 +61,16 @@ export default function UpdateReviewForm({
       onCancel();
     }
   }, [fetcher.data, onCancel, onUpdate, review._id]);
+
+  const handleDeleteReview = () => {
+    const formData = new FormData();
+    formData.append("reviewId", review._id);
+    formData.append("action", "deleteReview");
+    fetcher.submit(formData, {
+      method: "post",
+      action: `/books/${bookId}/review`,
+    });
+  };
 
   return (
     <Card className="mb-3 p-4 shadow-sm w-full" ref={formRef}>
@@ -95,16 +116,33 @@ export default function UpdateReviewForm({
               </Button>
             </div>
             <Button
-              type="submit"
-              name="action"
-              value="deleteReview"
+              type="button"
               variant="link"
               className="flex justify-end"
+              onClick={() => setShowDeleteDialog(true)}
             >
               Delete review
             </Button>
           </div>
         </fetcher.Form>
+
+        <AlertDialog open={showDeleteDialog} onOpenChange={setShowDeleteDialog}>
+          <AlertDialogContent>
+            <AlertDialogHeader>
+              <AlertDialogTitle>Are you sure?</AlertDialogTitle>
+              <AlertDialogDescription>
+                This action cannot be undone. This will permanently delete your
+                review.
+              </AlertDialogDescription>
+            </AlertDialogHeader>
+            <AlertDialogFooter>
+              <AlertDialogCancel>Cancel</AlertDialogCancel>
+              <AlertDialogAction onClick={handleDeleteReview}>
+                Delete
+              </AlertDialogAction>
+            </AlertDialogFooter>
+          </AlertDialogContent>
+        </AlertDialog>
       </CardContent>
     </Card>
   );
