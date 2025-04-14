@@ -1,7 +1,6 @@
 import {
   Label,
-  PolarGrid,
-  PolarRadiusAxis,
+  PolarAngleAxis,
   RadialBar,
   RadialBarChart,
 } from "recharts";
@@ -9,8 +8,6 @@ import {
 import {
   Card,
   CardContent,
-  CardDescription,
-  CardFooter,
   CardHeader,
 } from "../components/ui/card";
 import { type ChartConfig, ChartContainer } from "../components/ui/chart";
@@ -26,17 +23,18 @@ export function ProgressChart({ todayMinutes = 0, goalMinutes = 60, completionPe
   // Calculate the completion percentage capped at 100%
   const actualPercentage = Math.min(completionPercentage, 100);
   
+  // Create a simple data structure with a single data point
   const chartData = [
-    { 
-      name: "progress", 
-      value: actualPercentage, 
-      fill: "hsl(var(--chart-1))" 
-    },
+    {
+      name: "Progress",
+      value: actualPercentage,
+    }
   ];
-
+  
+  // Simple chart config
   const chartConfig = {
     value: {
-      label: "Progress",
+      label: "Reading Progress",
       color: "hsl(var(--chart-1))",
     },
   } satisfies ChartConfig;
@@ -57,51 +55,47 @@ export function ProgressChart({ todayMinutes = 0, goalMinutes = 60, completionPe
           className="mx-auto aspect-square max-h-[200px]"
         >
           <RadialBarChart
+            width={200}
+            height={200}
+            cx={100}
+            cy={100}
+            innerRadius={60}
+            outerRadius={80}
+            barSize={10}
             data={chartData}
-            startAngle={0}
-            endAngle={250}
-            innerRadius={80}
-            outerRadius={110}
+            startAngle={180}
+            endAngle={-180}
           >
-            <PolarGrid
-              gridType="circle"
-              radialLines={false}
-              stroke="none"
-              className="first:fill-primary-beige-10 last:fill-primary-dark"
-              polarRadius={[86, 74]}
+            <RadialBar
+              label={false}
+              background={{fill: "rgba(255, 255, 255, 0.2)"}}
+              dataKey="value"
+              className="fill-primary-beige"
             />
-            <RadialBar dataKey="value" background cornerRadius={10} className="fill-primary-beige"/>
-            <PolarRadiusAxis tick={false} tickLine={false} axisLine={false}>
-              <Label
-                content={({ viewBox }) => {
-                  if (viewBox && "cx" in viewBox && "cy" in viewBox) {
-                    return (
-                      <text
-                        x={viewBox.cx}
-                        y={viewBox.cy}
-                        textAnchor="middle"
-                        dominantBaseline="middle"
-                      >
-                        <tspan
-                          x={viewBox.cx}
-                          y={viewBox.cy}
-                          className="fill-primary-beige text-4xl font-bold"
-                        >
-                          {todayMinutes}
-                        </tspan>
-                        <tspan
-                          x={viewBox.cx}
-                          y={(viewBox.cy || 0) + 24}
-                          className="fill-primary-beige"
-                        >
-                          of {goalMinutes} min
-                        </tspan>
-                      </text>
-                    );
-                  }
-                }}
-              />
-            </PolarRadiusAxis>
+            <PolarAngleAxis
+              type="number"
+              domain={[0, 100]}
+              angleAxisId={0}
+              tick={false}
+            />
+            <text
+              x={100}
+              y={100}
+              textAnchor="middle"
+              dominantBaseline="middle"
+              className="fill-primary-beige text-4xl font-bold"
+            >
+              {todayMinutes}
+            </text>
+            <text
+              x={100}
+              y={124}
+              textAnchor="middle"
+              dominantBaseline="middle"
+              className="fill-primary-beige"
+            >
+              of {goalMinutes} min
+            </text>
           </RadialBarChart>
         </ChartContainer>
       </CardContent>
