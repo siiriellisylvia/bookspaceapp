@@ -16,11 +16,22 @@ import {
   AccordionTrigger,
   AccordionContent,
 } from "../components/ui/accordion";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "../components/ui/alert-dialog";
 import Book, { type BookType } from "../models/Book";
 import { logoutUser } from "../services/auth.server";
 import BookCard from "~/components/BookCard";
 import User from "~/models/User";
 import { Card } from "~/components/ui/card";
+import { useState } from "react";
 
 export async function loader({ request }: Route.LoaderArgs) {
   const user = await getAuthUser(request);
@@ -41,11 +52,10 @@ export default function ProfilePage({
 }) {
   const { user, userBooks } = loaderData;
   const submit = useSubmit();
+  const [showDeleteGoalDialog, setShowDeleteGoalDialog] = useState(false);
 
   const handleDeleteGoal = () => {
-    if (confirm("Are you sure you want to delete your reading goal?")) {
-      submit({ _action: "deleteGoal" }, { method: "post" });
-    }
+    submit({ _action: "deleteGoal" }, { method: "post" });
   };
 
   // Format reading goal for display
@@ -76,7 +86,11 @@ export default function ProfilePage({
               Edit
             </Button>
           </Link>
-          <Button size="sm" variant="outline" onClick={handleDeleteGoal}>
+          <Button
+            size="sm"
+            variant="outline"
+            onClick={() => setShowDeleteGoalDialog(true)}
+          >
             Delete
           </Button>
         </div>
@@ -171,6 +185,21 @@ export default function ProfilePage({
           Log Out
         </Button>
       </Form>
+
+      <AlertDialog open={showDeleteGoalDialog} onOpenChange={setShowDeleteGoalDialog}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Delete reading goal</AlertDialogTitle>
+            <AlertDialogDescription>
+              Are you sure you want to delete your reading goal? This action cannot be undone.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancel</AlertDialogCancel>
+            <AlertDialogAction onClick={handleDeleteGoal}>Delete</AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </main>
   );
 }
