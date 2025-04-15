@@ -18,7 +18,9 @@ export default [
     route("books", "routes/books.tsx"),
     route("books/:id", "routes/bookdetail.tsx"),
     route("books/:id/bookmark", "routes/bookmark.tsx"),
-    route("books/:id/review", "routes/review.tsx"),
+    route("books/:id/review", "routes/reviews/create.tsx"),
+    route("books/:id/edit-review", "routes/reviews/update.tsx"),
+    route("books/:id/delete-review", "routes/reviews/delete.tsx"),
     route("books/:id/read", "routes/read.tsx"),
     route(
       "books/:bookId/finish-reading-session",

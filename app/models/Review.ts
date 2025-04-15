@@ -15,13 +15,13 @@ const reviewSchema = new Schema(
     },
     rating: {
       type: Number,
-      required: true,
+      required: [true, "Rating between 1-5 is required"],
       min: 1, // Minimum rating is 1
       max: 5, // Maximum rating is 5
     },
     comment: {
       type: String,
-      required: true,
+      required: [true, "Review comment is required"],
     },
   },
   { timestamps: true }, // Automatically add `createdAt` and `updatedAt`
