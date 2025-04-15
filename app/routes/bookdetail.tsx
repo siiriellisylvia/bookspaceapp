@@ -2,11 +2,10 @@ import type { Route } from "../+types/root";
 import Book, { type BookType } from "../models/Book";
 import type { UserType } from "../models/User";
 import {
-  AiOutlineStar,
   AiOutlineBook,
   AiOutlineDown,
   AiOutlineUp,
-} from "react-icons/ai"; // Star & book icons
+} from "react-icons/ai"; // Book icons
 import { FaBookmark, FaRegBookmark, FaBookOpen, FaBook } from "react-icons/fa"; // Bookmark icons
 import { ChevronLeft } from "lucide-react"; // Import back arrow icon
 import BookCard from "~/components/BookCard";
@@ -17,6 +16,7 @@ import { getAuthUser } from "~/services/auth.server";
 import { Button } from "~/components/ui/button";
 import Review from "~/models/Review";
 import ReviewList from "~/components/review/ReviewList";
+import { renderStars } from "../utils/renderStars";
 
 // Loader to fetch book data from MongoDB
 export async function loader({ request, params }: Route.LoaderArgs) {
@@ -178,7 +178,7 @@ export default function BookDetail({
       <div className="flex flex-col items-center gap-4 mt-4">
         <div className="flex items-center gap-6 text-primary-beige">
           <div className="flex items-center gap-1">
-            <AiOutlineStar size={20} className="text-primary-beige" />
+            {renderStars(book.rating)}
             <span className="text-sm md:text-lg">{book.rating.toFixed(1)}</span>
           </div>
           <div className="flex items-center gap-1">
