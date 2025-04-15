@@ -398,10 +398,6 @@ export default function Insights({
                 <div className="flex flex-col gap-4">
                   <h2>Reading goal progress</h2>
                   <ReadingGoalChart data={periodicReadingData} />
-                  <p className="text-center">
-                    Your goal is to read {readingGoal.target} {readingGoal.type}{" "}
-                    {readingGoal.frequency}
-                  </p>
                 </div>
               </CardContent>
             </Card>
