@@ -142,8 +142,6 @@ export default function ReadingGoalsPage({
                 <SelectContent>
                   <SelectItem value="minutes">minutes</SelectItem>
                   <SelectItem value="hours">hours</SelectItem>
-                  <SelectItem value="pages">pages</SelectItem>
-                  <SelectItem value="books">books</SelectItem>
                 </SelectContent>
               </Select>
               {actionData?.errors?.goalType && (
@@ -215,7 +213,7 @@ export async function action({ request }: Route.ActionArgs) {
     errors.target = "Please enter a valid target number greater than 0";
   }
 
-  if (!goalType || !["minutes", "hours", "pages", "books"].includes(goalType)) {
+  if (!goalType || !["minutes", "hours"].includes(goalType)) {
     errors.goalType = "Please select a goal type";
   }
 
@@ -238,7 +236,7 @@ export async function action({ request }: Route.ActionArgs) {
 
     // Update the user's reading goal
     user.readingGoal = {
-      type: goalType as "minutes" | "hours" | "pages" | "books",
+      type: goalType as "minutes" | "hours",
       frequency: frequency as "daily" | "weekly" | "monthly",
       target: Number(target),
       isActive: true,
