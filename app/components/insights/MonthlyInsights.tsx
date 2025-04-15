@@ -22,6 +22,7 @@ export function MonthlyInsights({
 }: MonthlyInsightsProps) {
   return (
     <>
+      <h3 className="text-center mb-2 font-sans!">{currentMonth}</h3>
       <div className="grid grid-cols-2 gap-4">
         <Card className="p-4">
           <h4 className="text-center font-sans!">Minutes read this month</h4>
@@ -31,9 +32,6 @@ export function MonthlyInsights({
           <p className="text-center mt-0">
             That's approximately {Math.round(monthlyMinutesRead / 60)} hours
             this month!
-          </p>
-          <p className="text-center text-sm mt-0">
-            Month: {currentMonth}
           </p>
         </Card>
 
