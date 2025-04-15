@@ -93,7 +93,7 @@ export default function BooksPage({
     <section className="flex flex-col mx-auto px-2 py-20 md:px-40 md:py-10">
       {/* Filter controls - full width in flex-col */}
       <div className="flex flex-col w-full space-y-4 mb-6">
-        <h1 className="text-center text-2xl font-bold">Books</h1>
+        <h1>Books</h1>
 
         {/* Search - full width */}
         <div className="w-full relative">
@@ -138,26 +138,26 @@ export default function BooksPage({
           </DropdownMenu>
         </div>
 
-        {/* Rating - full width */}
-        <div className="w-full">
-          <div className="flex items-center">
-            <Slider
-              value={[minRating]}
-              min={0}
-              max={5}
-              step={0.1}
-              onValueChange={(value) => setMinRating(value[0])}
-              className="flex-1"
-            />
-            <div className="ml-4 mr-2 flex items-center">
-              <span className="mr-2">{minRating.toFixed(1)}</span>
-              <Star className="h-4 w-4 fill-primary-beige" />
+        {/* Rating and Clear filters - on one line */}
+        <div className="w-full flex flex-row items-end justify-between">
+          <div className="flex flex-col flex-1 mr-4">
+            <span className="text-sm text-primary-beige-80 mb-1">Minimum rating:</span>
+            <div className="flex items-center w-full">
+              <Slider
+                value={[minRating]}
+                min={0}
+                max={5}
+                step={0.1}
+                onValueChange={(value) => setMinRating(value[0])}
+                className="flex-1"
+              />
+              <div className="ml-2 flex items-center">
+                <span className="mr-1">{minRating.toFixed(1)}</span>
+                <Star className="h-4 w-4 fill-primary-beige" />
+              </div>
             </div>
           </div>
-        </div>
-
-        {/* Clear filters button */}
-        <div className="flex justify-end w-full">
+          
           <Button
             variant="link"
             onClick={resetFilters}
