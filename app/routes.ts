@@ -10,7 +10,7 @@ export default [
   index("routes/welcome.tsx"), // Welcome page as the index route (/)
   route("signup", "routes/signup.tsx"),
   route("signin", "routes/signin.tsx"),
-  
+
   // Protected routes - require authentication
   layout("layouts/protected.tsx", [
     route("/home", "routes/home.tsx"),
@@ -21,6 +21,7 @@ export default [
     route("books/:id/review", "routes/reviews/create.tsx"),
     route("books/:id/edit-review", "routes/reviews/update.tsx"),
     route("books/:id/delete-review", "routes/reviews/delete.tsx"),
+    route("my-books", "routes/my-books.tsx"),
     route("books/:id/read", "routes/read.tsx"),
     route(
       "books/:bookId/finish-reading-session",
