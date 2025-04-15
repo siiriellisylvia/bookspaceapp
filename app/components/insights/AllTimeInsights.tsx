@@ -44,21 +44,6 @@ export function AllTimeInsights({
         </Card>
       </div>
 
-      {readingGoal &&
-        readingGoal.isActive &&
-        (readingGoal.type === "minutes" || readingGoal.type === "hours") &&
-        periodicReadingData.length > 0 && (
-          <Card>
-            <h2 className="mb-4 text-center">
-              Reading goal progress
-            </h2>
-            <p className="text-center mb-4">
-              Your goal: {readingGoal.target} {readingGoal.type}{" "}
-              {readingGoal.frequency}
-            </p>
-            <ReadingGoalChart data={periodicReadingData} />
-          </Card>
-        )}
     </>
   );
 }

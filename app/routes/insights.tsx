@@ -17,6 +17,7 @@ import {
   endOfWeek,
 } from "date-fns";
 import {
+  ReadingGoalChart,
   type ReadingPeriodData,
 } from "~/components/ReadingGoalChart";
 import {
@@ -29,6 +30,7 @@ import { WeeklyInsights } from "~/components/insights/WeeklyInsights";
 import { MonthlyInsights } from "~/components/insights/MonthlyInsights";
 import { AllTimeInsights } from "~/components/insights/AllTimeInsights";
 import { ProgressChart } from "~/components/ProgressChart";
+import { Card } from "~/components/ui/card";
 
 export async function loader({ request }: Route.LoaderArgs) {
   const currentUserId = await authenticateUser(request);
@@ -357,8 +359,23 @@ export default function Insights({
         goalFrequency={readingGoal?.frequency || "daily"}
         showGoal={!!readingGoal?.isActive}
       />
+      {readingGoal &&
+              readingGoal.isActive &&
+              (readingGoal.type === "minutes" || readingGoal.type === "hours") &&
+              periodicReadingData.length > 0 && (
+                <Card>
+                  <h2 className="mb-4 text-center">
+                    Reading goal progress
+                  </h2>
+                  <p className="text-center mb-4">
+                    Your goal: {readingGoal.target} {readingGoal.type}{" "}
+                    {readingGoal.frequency}
+                  </p>
+                  <ReadingGoalChart data={periodicReadingData} />
+                </Card>
+              )}
       <div className="mt-6 mb-4 flex items-center justify-between">
-        <h2 className="text-lg">Reading goal progress</h2>
+        <h2 className="text-lg">Your reading habits in numbers</h2>
       </div>
       <Tabs defaultValue="weekly" className="w-full">
         <TabsList className="w-full">
