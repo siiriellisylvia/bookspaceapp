@@ -30,7 +30,7 @@ import Book, { type BookType } from "../models/Book";
 import { logoutUser } from "../services/auth.server";
 import BookCard from "~/components/BookCard";
 import User from "~/models/User";
-import { Card } from "~/components/ui/card";
+import { Card, CardContent } from "~/components/ui/card";
 import { useState } from "react";
 
 export async function loader({ request }: Route.LoaderArgs) {
@@ -62,11 +62,13 @@ export default function ProfilePage({
   const showReadingGoal = () => {
     if (!user.readingGoal || !user.readingGoal.isActive) {
       return (
-        <Card>
-          <p className="mb-3">No reading goal set yet</p>
-          <Link to="/reading-goals">
-            <Button>Set a reading goal</Button>
-          </Link>
+        <Card className="flex items-center">
+          <CardContent>
+            <p className="mb-3">No reading goal set yet</p>
+            <Link to="/reading-goals">
+              <Button>Set a reading goal</Button>
+            </Link>
+          </CardContent>
         </Card>
       );
     }
@@ -99,8 +101,8 @@ export default function ProfilePage({
   };
 
   return (
-    <main className="flex flex-col items-center px-2 py-20 md:px-40 md:py-10 h-screen mx-4 lg:mx-60">
-      <div className="flex flex-col items-center gap-4">
+    <main className="flex flex-col items-center px-4 py-20 md:py-10 mx-auto max-w-4xl min-h-screen">
+      <div className="flex flex-col items-center gap-4 mb-6">
         <div className="relative">
           <img
             src={user.image || "https://avatar.iran.liara.run/public"}
@@ -112,23 +114,21 @@ export default function ProfilePage({
       </div>
 
       {/* Reading Goal displayed above accordion */}
-      <div className="w-full my-6 max-w-md mx-auto">
+      <div className="w-full mb-2 max-w-md">
         {user.readingGoal && user.readingGoal.isActive && (
-          <div className="flex items-center justify-between mb-2">
-            <p className="flex items-center gap-2">
-              <FaChartLine />
-              Reading goal
-            </p>
+          <div className="flex items-center mb-2">
+            <FaChartLine className="mr-2" />
+            <span className="text-sm">Reading goal</span>
           </div>
         )}
         {showReadingGoal()}
       </div>
 
-      <div className="w-full mt-2">
+      <div className="w-full">
         <Accordion
           type="single"
           collapsible
-          className="w-full md:w-1/2 mx-auto"
+          className="w-full max-w-md mx-auto"
         >
           <AccordionItem value="saved-books">
             <AccordionTrigger className="flex gap-2 font-sans text-sm">
@@ -137,7 +137,7 @@ export default function ProfilePage({
             </AccordionTrigger>
             <AccordionContent>
               {userBooks.length > 0 ? (
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                   {userBooks.map((book) => (
                     <BookCard key={book._id.toString()} book={book} />
                   ))}
@@ -148,16 +148,7 @@ export default function ProfilePage({
             </AccordionContent>
           </AccordionItem>
 
-          <AccordionItem value="notes-quotes">
-            <AccordionTrigger className="flex items-center gap-2 font-sans text-sm">
-              <FaQuoteLeft />
-              My Notes & Quotes
-            </AccordionTrigger>
-            <AccordionContent>
-              <p>Feature coming soon...</p>
-            </AccordionContent>
-          </AccordionItem>
-
+        
           <AccordionItem value="my-books">
             <AccordionTrigger className="flex items-center gap-2 font-sans text-sm">
               <FaBook />
@@ -179,24 +170,29 @@ export default function ProfilePage({
           </AccordionItem>
         </Accordion>
       </div>
-      <Form method="post">
+
+      <Form method="post" className="mt-6 mb-8">
         <input type="hidden" name="_action" value="logout" />
-        <Button className="mt-4" type="submit">
-          Log Out
-        </Button>
+        <Button type="submit">Log Out</Button>
       </Form>
 
-      <AlertDialog open={showDeleteGoalDialog} onOpenChange={setShowDeleteGoalDialog}>
+      <AlertDialog
+        open={showDeleteGoalDialog}
+        onOpenChange={setShowDeleteGoalDialog}
+      >
         <AlertDialogContent>
           <AlertDialogHeader>
             <AlertDialogTitle>Delete reading goal</AlertDialogTitle>
             <AlertDialogDescription>
-              Are you sure you want to delete your reading goal? This action cannot be undone.
+              Are you sure you want to delete your reading goal? This action
+              cannot be undone.
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
             <AlertDialogCancel>Cancel</AlertDialogCancel>
-            <AlertDialogAction onClick={handleDeleteGoal}>Delete</AlertDialogAction>
+            <AlertDialogAction onClick={handleDeleteGoal}>
+              Delete
+            </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
