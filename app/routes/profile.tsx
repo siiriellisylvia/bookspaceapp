@@ -8,29 +8,15 @@ import {
   FaBook,
   FaStar,
   FaChartLine,
+  FaChevronRight,
 } from "react-icons/fa";
 import { Button } from "../components/ui/button";
-import {
-  Accordion,
-  AccordionItem,
-  AccordionTrigger,
-  AccordionContent,
-} from "../components/ui/accordion";
-import {
-  AlertDialog,
-  AlertDialogAction,
-  AlertDialogCancel,
-  AlertDialogContent,
-  AlertDialogDescription,
-  AlertDialogFooter,
-  AlertDialogHeader,
-  AlertDialogTitle,
-} from "../components/ui/alert-dialog";
+import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "../components/ui/alert-dialog";
+import { Separator } from "../components/ui/separator";
 import Book, { type BookType } from "../models/Book";
 import { logoutUser } from "../services/auth.server";
-import BookCard from "~/components/BookCard";
 import User from "~/models/User";
-import { Card, CardContent } from "~/components/ui/card";
+import { Card } from "~/components/ui/card";
 import { useState } from "react";
 
 export async function loader({ request }: Route.LoaderArgs) {
@@ -62,13 +48,11 @@ export default function ProfilePage({
   const showReadingGoal = () => {
     if (!user.readingGoal || !user.readingGoal.isActive) {
       return (
-        <Card className="flex items-center">
-          <CardContent>
-            <p className="mb-3">No reading goal set yet</p>
-            <Link to="/reading-goals">
-              <Button>Set a reading goal</Button>
-            </Link>
-          </CardContent>
+        <Card className="p-4">
+          <p className="mb-3">No reading goal set yet</p>
+          <Link to="/reading-goals">
+            <Button>Set a reading goal</Button>
+          </Link>
         </Card>
       );
     }
@@ -76,7 +60,7 @@ export default function ProfilePage({
     const { target, type, frequency } = user.readingGoal;
 
     return (
-      <Card>
+      <Card className="p-4">
         <div className="mb-3 flex items-center justify-center gap-2 text-xl font-bold">
           <span>{target}</span>
           <span>{type}</span>
@@ -101,7 +85,7 @@ export default function ProfilePage({
   };
 
   return (
-    <main className="flex flex-col items-center px-4 py-20 md:py-10 mx-auto max-w-4xl min-h-screen">
+    <main className="flex flex-col items-center px-4 py-20 mx-auto max-w-4xl min-h-screen">
       <div className="flex flex-col items-center gap-4 mb-6">
         <div className="relative">
           <img
@@ -113,8 +97,8 @@ export default function ProfilePage({
         <h1>{user.name}</h1>
       </div>
 
-      {/* Reading Goal displayed above accordion */}
-      <div className="w-full mb-2 max-w-md">
+      {/* Reading Goal section */}
+      <div className="w-full mb-6 max-w-md">
         {user.readingGoal && user.readingGoal.isActive && (
           <div className="flex items-center mb-2">
             <FaChartLine className="mr-2" />
@@ -124,51 +108,40 @@ export default function ProfilePage({
         {showReadingGoal()}
       </div>
 
-      <div className="w-full">
-        <Accordion
-          type="single"
-          collapsible
-          className="w-full max-w-md mx-auto"
-        >
-          <AccordionItem value="saved-books">
-            <AccordionTrigger className="flex gap-2 font-sans text-sm">
-              <FaBookmark />
-              Saved Books
-            </AccordionTrigger>
-            <AccordionContent>
-              {userBooks.length > 0 ? (
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                  {userBooks.map((book) => (
-                    <BookCard key={book._id.toString()} book={book} />
-                  ))}
-                </div>
-              ) : (
-                <p>No saved books yet.</p>
-              )}
-            </AccordionContent>
-          </AccordionItem>
+      {/* Navigation links replacing accordion */}
+      <div className="w-full max-w-md">
+        <Link to="/saved-books" className="w-full">
+          <div className="flex items-center justify-between py-3">
+            <div className="flex items-center gap-2 font-sans text-sm">
+              <FaBookmark className="text-primary-beige" />
+              <span>Saved Books</span>
+            </div>
+            <FaChevronRight className="text-sm text-gray-400" />
+          </div>
+        </Link>
+        <Separator />
 
-        
-          <AccordionItem value="my-books">
-            <AccordionTrigger className="flex items-center gap-2 font-sans text-sm">
-              <FaBook />
-              My Books
-            </AccordionTrigger>
-            <AccordionContent>
-              <p>You haven't added any books yet.</p>
-            </AccordionContent>
-          </AccordionItem>
+        <Link to="/my-books" className="w-full">
+          <div className="flex items-center justify-between py-3">
+            <div className="flex items-center gap-2 font-sans text-sm">
+              <FaBook className="text-primary-beige" />
+              <span>My Books</span>
+            </div>
+            <FaChevronRight className="text-sm text-primary-beige" />
+          </div>
+        </Link>
+        <Separator />
 
-          <AccordionItem value="my-reviews">
-            <AccordionTrigger className="flex items-center gap-2 font-sans text-sm">
-              <FaStar />
-              My Reviews
-            </AccordionTrigger>
-            <AccordionContent>
-              <p>No reviews yet.</p>
-            </AccordionContent>
-          </AccordionItem>
-        </Accordion>
+        <Link to="/my-reviews" className="w-full">
+          <div className="flex items-center justify-between py-3">
+            <div className="flex items-center gap-2 font-sans text-sm">
+              <FaStar className="text-primary-beige" />
+              <span>My Reviews</span>
+            </div>
+            <FaChevronRight className="text-sm text-primary-beige" />
+          </div>
+        </Link>
+        <Separator />
       </div>
 
       <Form method="post" className="mt-6 mb-8">
