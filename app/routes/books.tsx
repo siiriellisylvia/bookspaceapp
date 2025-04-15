@@ -171,9 +171,9 @@ export default function BooksPage({
       {/* Results count */}
       <div className="mb-4">
         <p className="text-primary-beige-80 text-center">
-          Showing {filteredBooks.length} of {books.length} books
+          Showing {filteredBooks.length} {filteredBooks.length === 1 ? "book" : "books"}
           {selectedGenres.length > 0 &&
-            ` in ${selectedGenres.length} selected ${selectedGenres.length === 1 ? "genre" : "genres"}`}
+            ` in ${selectedGenres.join(", ")}`}
           {minRating > 0 && ` with rating over ${minRating.toFixed(1)}`}
         </p>
       </div>
