@@ -102,7 +102,7 @@ export default function Home({
     <div className="flex flex-col gap-4 px-4 py-20 md:py-10 items-center max-w-4xl mx-auto">
       <h1 className="text-2xl font-bold mb-4">Welcome, {userName}!</h1>
       <Card
-        className="w-full mb-4 overflow-hidden"
+        className="w-full h-40 mb-4 overflow-hidden"
         style={{
           backgroundImage: `url(${springBgImage})`,
           backgroundSize: "cover",
@@ -110,7 +110,7 @@ export default function Home({
           position: "relative",
         }}
       >
-        <CardContent className="relative w-1/2 ml-auto">
+        <CardContent className="flex justify-end items-center h-full">
           <h2 className="w-1/3 md:w/2 text-2xl! text-primary-burgundy!">
             Spring favourites
           </h2>
