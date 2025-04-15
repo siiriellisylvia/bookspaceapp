@@ -14,12 +14,25 @@ import { type ChartConfig, ChartContainer } from "../components/ui/chart";
 
 // Define type for the ProgressChart props
 interface ProgressChartProps {
-  todayMinutes?: number;
+  minutesRead?: number;
   goalMinutes?: number;
   completionPercentage?: number;
+  goalFrequency?: string;
+  showGoal?: boolean;
 }
 
-export function ProgressChart({ todayMinutes = 0, goalMinutes = 60, completionPercentage = 0 }: ProgressChartProps) {
+export function ProgressChart({ 
+  minutesRead = 0, 
+  goalMinutes = 60, 
+  completionPercentage = 0,
+  goalFrequency = "daily",
+  showGoal = true
+}: ProgressChartProps) {
+  // If showGoal is false, don't render the component
+  if (!showGoal) {
+    return null;
+  }
+
   // Calculate the completion percentage capped at 100%
   const actualPercentage = Math.min(completionPercentage, 100);
   
@@ -39,16 +52,22 @@ export function ProgressChart({ todayMinutes = 0, goalMinutes = 60, completionPe
     },
   } satisfies ChartConfig;
 
-  const remainingMinutes = goalMinutes - todayMinutes;
+  const remainingMinutes = goalMinutes - minutesRead;
+  
+  // Format the title and period based on goal frequency
+  const goalTitle = `${goalFrequency.charAt(0).toUpperCase() + goalFrequency.slice(1)} goal`;
+  const periodLabel = goalFrequency === "daily" ? "today" : 
+                      goalFrequency === "weekly" ? "this week" : 
+                      goalFrequency === "monthly" ? "this month" : "today";
 
   return (
     <Card className="flex flex-col">
       <CardHeader className="items-center pb-0">
-        <h2>Daily goal</h2>
+        <h2>{goalTitle}</h2>
         <p className="text-sm">
           {actualPercentage >= 100
-            ? "Well done, you've reached your goal today!"
-            : `You are just ${remainingMinutes} minutes away from your daily goal, keep going!`}
+            ? `Well done, you've reached your ${goalFrequency} goal ${periodLabel}!`
+            : `You are just ${remainingMinutes} minutes away from your ${goalFrequency} goal, keep going!`}
         </p>
       </CardHeader>
       <CardContent className="flex-1 pb-0">
@@ -87,7 +106,7 @@ export function ProgressChart({ todayMinutes = 0, goalMinutes = 60, completionPe
               dominantBaseline="middle"
               className="fill-primary-beige text-4xl font-bold"
             >
-              {todayMinutes}
+              {minutesRead}
             </text>
             <text
               x={100}
@@ -100,7 +119,7 @@ export function ProgressChart({ todayMinutes = 0, goalMinutes = 60, completionPe
             </text>
           </RadialBarChart>
         </ChartContainer>
-        <p className="text-center">{todayMinutes} minutes out of {goalMinutes} minutes read today</p>
+        <p className="text-center">{minutesRead} minutes out of {goalMinutes} minutes read {periodLabel}</p>
       </CardContent>
     </Card>
   );

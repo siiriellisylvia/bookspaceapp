@@ -25,10 +25,10 @@ import {
   TabsTrigger,
   TabsContent,
 } from "../components/ui/tabs";
-import { ProgressChart } from "~/components/ProgressChart";
 import { WeeklyInsights } from "~/components/insights/WeeklyInsights";
 import { MonthlyInsights } from "~/components/insights/MonthlyInsights";
 import { AllTimeInsights } from "~/components/insights/AllTimeInsights";
+import { ProgressChart } from "~/components/ProgressChart";
 
 export async function loader({ request }: Route.LoaderArgs) {
   const currentUserId = await authenticateUser(request);
@@ -247,6 +247,37 @@ export async function loader({ request }: Route.LoaderArgs) {
     });
   });
 
+  // Calculate appropriate time period reading for the selected goal frequency
+  let periodMinutesRead = 0;
+  let periodGoalMinutes = 0;
+  
+  if (readingGoal && readingGoal.isActive) {
+    // Convert goal to minutes if needed
+    const rawGoalMinutes = readingGoal.type === 'hours' 
+      ? readingGoal.target * 60 
+      : (readingGoal.type === 'minutes' ? readingGoal.target : 0);
+    
+    // Set the target minutes based on frequency without dividing
+    periodGoalMinutes = rawGoalMinutes;
+    
+    // Calculate actual reading minutes based on the goal frequency
+    if (readingGoal.frequency === 'daily') {
+      // For daily goals, use today's reading
+      periodMinutesRead = todayMinutesRead;
+    } else if (readingGoal.frequency === 'weekly') {
+      // For weekly goals, sum up the week's reading minutes
+      periodMinutesRead = weeklyMinutesRead;
+    } else if (readingGoal.frequency === 'monthly') {
+      // For monthly goals, sum up the month's reading minutes
+      periodMinutesRead = monthlyMinutesRead;
+    }
+  }
+  
+  // Calculate completion percentage based on the appropriate period
+  const periodCompletionPercentage = periodGoalMinutes > 0 
+    ? Math.round((periodMinutesRead / periodGoalMinutes) * 100) 
+    : 0;
+
   return Response.json({
     totalMinutesRead,
     totalBooksRead: sortedBooks.length,
@@ -255,6 +286,9 @@ export async function loader({ request }: Route.LoaderArgs) {
     todayMinutesRead,
     dailyGoalMinutes,
     completionPercentage,
+    periodMinutesRead,
+    periodGoalMinutes,
+    periodCompletionPercentage,
     weeklyMinutesRead,
     weeklyBooksRead: weeklyReadBooks.size,
     monthlyMinutesRead,
@@ -283,6 +317,9 @@ export default function Insights({
     todayMinutesRead: number;
     dailyGoalMinutes: number;
     completionPercentage: number;
+    periodMinutesRead: number;
+    periodGoalMinutes: number;
+    periodCompletionPercentage: number;
     weeklyMinutesRead: number;
     weeklyBooksRead: number;
     monthlyMinutesRead: number;
@@ -299,9 +336,9 @@ export default function Insights({
     totalBooksRead, 
     readingGoal, 
     periodicReadingData,
-    todayMinutesRead,
-    dailyGoalMinutes,
-    completionPercentage,
+    periodMinutesRead,
+    periodGoalMinutes,
+    periodCompletionPercentage,
     weeklyMinutesRead,
     weeklyBooksRead,
     monthlyMinutesRead,
@@ -314,9 +351,11 @@ export default function Insights({
     <div className="mx-auto py-20 px-4 md:px-40">
       <h1 className="mb-8 text-center">Reading insights</h1>
       <ProgressChart 
-        todayMinutes={todayMinutesRead} 
-        goalMinutes={dailyGoalMinutes} 
-        completionPercentage={completionPercentage}
+        minutesRead={periodMinutesRead} 
+        goalMinutes={periodGoalMinutes} 
+        completionPercentage={periodCompletionPercentage}
+        goalFrequency={readingGoal?.frequency || "daily"}
+        showGoal={!!readingGoal?.isActive}
       />
       <div className="mt-6 mb-4 flex items-center justify-between">
         <h2 className="text-lg">Reading goal progress</h2>
