@@ -23,6 +23,7 @@ export default [
     route("books/:id/delete-review", "routes/reviews/delete.tsx"),
     route("profile/my-books", "routes/my-books.tsx"),
     route("profile/my-reviews", "routes/my-reviews.tsx"),
+    route("profile/my-bookmarks", "routes/my-bookmarks.tsx"),
     route("books/:id/read", "routes/read.tsx"),
     route(
       "books/:bookId/finish-reading-session",
