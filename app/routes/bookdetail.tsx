@@ -136,7 +136,7 @@ export default function BookDetail({
   const navigate = useNavigate();
 
   return (
-    <div className="flex flex-col items-center px-2 py-20 md:p-10 max-w-3xl mx-auto">
+    <div className="flex flex-col items-center px-4 py-20 md:px-4 md:p-10 max-w-full sm:max-w-xl lg:max-w-2xl mx-auto">
       <div className="w-full flex items-center mb-4">
         <Button
           variant="ghost"
@@ -147,7 +147,7 @@ export default function BookDetail({
           <ChevronLeft />
         </Button>
       </div>
-      <div className="relative w-full max-w-sm">
+      <div className="relative w-full">
         <img
           src={book.coverImage?.url}
           alt={book.title}
@@ -271,9 +271,12 @@ export default function BookDetail({
               />
             ))
           ) : (
-            <p className="text-gray-500">No similar books found.</p>
+            <p className="text-primary-beige">No similar books found.</p>
           )}
         </div>
+      </div>
+      
+      <div className="w-full mt-6">
         <ReviewList
           reviews={reviews}
           book={book}
