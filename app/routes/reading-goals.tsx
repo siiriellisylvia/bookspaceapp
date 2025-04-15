@@ -1,10 +1,10 @@
 import { useState } from "react";
-import { redirect, useNavigate } from "react-router";
+import { redirect, useNavigate, useActionData } from "react-router";
 import { Button } from "~/components/ui/button";
 import { getAuthUser } from "~/services/auth.server";
 import type { Route } from "../+types/root";
 import User from "~/models/User";
-import { ChevronLeft} from "lucide-react";
+import { ChevronLeft } from "lucide-react";
 import {
   Select,
   SelectContent,
@@ -31,6 +31,10 @@ export default function ReadingGoalsPage({
 }) {
   const { user } = loaderData;
   const navigate = useNavigate();
+  const actionData = useActionData<{
+    errors?: { target?: string; goalType?: string; frequency?: string };
+    error?: string;
+  }>();
 
   // Default values based on user's existing goal or sensible defaults
   const initialTarget = user.readingGoal?.target || 30;
@@ -58,6 +62,12 @@ export default function ReadingGoalsPage({
         method="post"
         className="flex flex-col flex-1 md:pb-12 w-full md:w-1/2 mx-auto"
       >
+        {actionData?.error && (
+          <div className="bg-primary-destructive-90 text-white p-3 rounded-md mb-4">
+            {actionData.error}
+          </div>
+        )}
+
         <div className="flex flex-col gap-8 flex-1">
           <section className="flex flex-col gap-4 mx-auto">
             <div className="text-center mb-8">
@@ -92,8 +102,13 @@ export default function ReadingGoalsPage({
                     setTarget(value);
                   }
                 }}
-                className="w-20 text-center text-4xl border-none focus:outline-none [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+                className={`w-20 text-center text-4xl border-none focus:outline-none [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none ${
+                  actionData?.errors?.target
+                    ? "border-primary-destructive ring-primary-destructive"
+                    : ""
+                }`}
                 min="1"
+                aria-invalid={actionData?.errors?.target ? "true" : undefined}
               />
               <Button
                 type="button"
@@ -104,6 +119,11 @@ export default function ReadingGoalsPage({
                 +10
               </Button>
             </div>
+            {actionData?.errors?.target && (
+              <p className="text-primary-destructive text-xs text-center">
+                {actionData.errors.target}
+              </p>
+            )}
 
             {/* Goal type selector using shadcn */}
             <div className="mt-6 w-1/2 mx-auto">
@@ -112,7 +132,11 @@ export default function ReadingGoalsPage({
                 defaultValue={goalType}
                 onValueChange={(value) => setGoalType(value)}
               >
-                <SelectTrigger className="w-full text-center h-14">
+                <SelectTrigger
+                  className={`w-full text-center h-14 ${
+                    actionData?.errors?.goalType ? "border-primary-destructive" : ""
+                  }`}
+                >
                   <SelectValue placeholder="Select goal type" />
                 </SelectTrigger>
                 <SelectContent>
@@ -122,6 +146,11 @@ export default function ReadingGoalsPage({
                   <SelectItem value="books">books</SelectItem>
                 </SelectContent>
               </Select>
+              {actionData?.errors?.goalType && (
+                <p className="text-primary-destructive text-xs mt-1 text-center">
+                  {actionData.errors.goalType}
+                </p>
+              )}
             </div>
 
             {/* Frequency selector using shadcn Select */}
@@ -131,7 +160,11 @@ export default function ReadingGoalsPage({
                 defaultValue={frequency}
                 onValueChange={(value) => setFrequency(value)}
               >
-                <SelectTrigger className="w-full text-center h-14">
+                <SelectTrigger
+                  className={`w-full text-center h-14 ${
+                    actionData?.errors?.frequency ? "border-primary-destructive" : ""
+                  }`}
+                >
                   <SelectValue placeholder="Select frequency" />
                 </SelectTrigger>
                 <SelectContent>
@@ -140,6 +173,11 @@ export default function ReadingGoalsPage({
                   <SelectItem value="monthly">monthly</SelectItem>
                 </SelectContent>
               </Select>
+              {actionData?.errors?.frequency && (
+                <p className="text-primary-destructive text-xs mt-1 text-center">
+                  {actionData.errors.frequency}
+                </p>
+              )}
             </div>
           </section>
 
@@ -166,32 +204,43 @@ export async function action({ request }: Route.ActionArgs) {
   }
 
   const formData = await request.formData();
-  const target = Number(formData.get("target") || "0");
+  const target = formData.get("target");
   const goalType = formData.get("goalType") as string;
   const frequency = formData.get("frequency") as string;
 
-  // Validate inputs
-  if (
-    target <= 0 ||
-    !["minutes", "hours", "pages", "books"].includes(goalType) ||
-    !["daily", "weekly", "monthly"].includes(frequency)
-  ) {
-    return {
-      error: "Invalid goal settings. Please try again.",
-    };
+  // Simple validation
+  const errors: { target?: string; goalType?: string; frequency?: string } = {};
+
+  if (!target || Number(target) <= 0) {
+    errors.target = "Please enter a valid target number greater than 0";
+  }
+
+  if (!goalType || !["minutes", "hours", "pages", "books"].includes(goalType)) {
+    errors.goalType = "Please select a goal type";
+  }
+
+  if (!frequency || !["daily", "weekly", "monthly"].includes(frequency)) {
+    errors.frequency = "Please select a frequency";
+  }
+
+  // Return validation errors if any
+  if (Object.keys(errors).length > 0) {
+    return { errors };
   }
 
   try {
     const user = await User.findById(userId);
     if (!user) {
-      throw new Response("User Not Found", { status: 404 });
+      return {
+        error: "User not found. Please try signing in again.",
+      };
     }
 
     // Update the user's reading goal
     user.readingGoal = {
       type: goalType as "minutes" | "hours" | "pages" | "books",
       frequency: frequency as "daily" | "weekly" | "monthly",
-      target: target,
+      target: Number(target),
       isActive: true,
       createdAt: new Date(),
     };
