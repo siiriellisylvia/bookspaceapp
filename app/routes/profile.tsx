@@ -16,7 +16,7 @@ import { Separator } from "../components/ui/separator";
 import Book, { type BookType } from "../models/Book";
 import { logoutUser } from "../services/auth.server";
 import User from "~/models/User";
-import { Card } from "~/components/ui/card";
+import { Card, CardContent } from "~/components/ui/card";
 import { useState } from "react";
 
 export async function loader({ request }: Route.LoaderArgs) {
@@ -48,11 +48,13 @@ export default function ProfilePage({
   const showReadingGoal = () => {
     if (!user.readingGoal || !user.readingGoal.isActive) {
       return (
-        <Card className="p-4">
+        <Card>
+          <CardContent className="flex flex-col items-center justify-center text-center">
           <p className="mb-3">No reading goal set yet</p>
           <Link to="/reading-goals">
             <Button>Set a reading goal</Button>
           </Link>
+          </CardContent>
         </Card>
       );
     }
