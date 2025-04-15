@@ -1,7 +1,21 @@
 import logo from "../assets/logo-beige.svg";
-import { Link } from "react-router";
+import { Link, redirect } from "react-router";
 import { Button } from "~/components/ui/button";
 import books from "../assets/signup-image.png";
+import { getAuthUserId } from "~/services/auth.server";
+import type { Route } from "./+types/welcome";
+
+export async function loader({ request }: Route.LoaderArgs) {
+  const authUserId = await getAuthUserId(request);
+
+  // If user is authenticated, redirect to home page
+  if (authUserId) {
+    return redirect("/home");
+  }
+
+  // If not authenticated, continue to show the welcome page
+  return null;
+}
 
 export default function WelcomePage() {
   return (
