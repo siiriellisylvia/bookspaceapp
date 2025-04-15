@@ -60,15 +60,16 @@ export default function MyBooksPage() {
 
   return (
     <main className="min-h-screen py-20 px-4 md:py-10 md:px-40">
-      <div className="w-full flex items-center justify-between">
+      <div className="w-full flex justify-center mb-4">
         <Button
           variant="ghost"
           size="icon"
           onClick={() => navigate(-1)}
-          className="rounded-full md:hidden"
+          className="rounded-full md:hidden absolute left-4 top-20"
         >
           <ChevronLeft />
         </Button>
+        <h1>My books</h1>
       </div>
       <div className="px-4 max-w-4xl mx-auto">
         <Tabs
@@ -77,7 +78,7 @@ export default function MyBooksPage() {
           className="w-full"
         >
           <div className="flex justify-center">
-            <TabsList className="grid w-full max-w-xs grid-cols-2 mb-6 bg-primary-off-white dark:bg-primary-dark border border-primary-beige dark:border-primary-beige-20 rounded-lg">
+            <TabsList className="w-full max-w-xs">
               <TabsTrigger value="current">Current</TabsTrigger>
               <TabsTrigger value="finished">Finished</TabsTrigger>
             </TabsList>
@@ -210,11 +211,7 @@ export default function MyBooksPage() {
                           ))}
                         </div>
                       </div>
-                      <div className="mt-3">
-                        <Link to={`/books/${book._id}/read`}>
-                          <Button variant="default">Reading mode</Button>
-                        </Link>
-                      </div>
+
                     </div>
                   </div>
                 ))}

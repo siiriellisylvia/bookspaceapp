@@ -4,7 +4,6 @@ import { type UserType } from "../models/User";
 import { getAuthUser } from "../services/auth.server";
 import {
   FaBookmark,
-  FaQuoteLeft,
   FaBook,
   FaStar,
   FaChartLine,
@@ -111,7 +110,7 @@ export default function ProfilePage({
       </div>
 
       <div className="w-full max-w-md">
-        <Link to="/my-books" className="w-full">
+        <Link to="my-books" className="w-full">
           <div className="flex items-center justify-between py-3">
             <div className="flex items-center gap-2 font-sans text-sm">
               <FaBook className="text-primary-beige" />
@@ -122,7 +121,7 @@ export default function ProfilePage({
         </Link>
         <Separator />
 
-        <Link to="/my-bookmarks" className="w-full">
+        <Link to="my-bookmarks" className="w-full">
           <div className="flex items-center justify-between py-3">
             <div className="flex items-center gap-2 font-sans text-sm">
               <FaBookmark className="text-primary-beige" />
@@ -133,7 +132,7 @@ export default function ProfilePage({
         </Link>
         <Separator />
 
-        <Link to="/my-reviews" className="w-full">
+        <Link to="my-reviews" className="w-full">
           <div className="flex items-center justify-between py-3">
             <div className="flex items-center gap-2 font-sans text-sm">
               <FaStar className="text-primary-beige" />
