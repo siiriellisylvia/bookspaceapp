@@ -1,6 +1,7 @@
 // filepath: c:\Users\siiri\BAU\awu-re-exam-siiriellisylvia\app\routes\reviews\update.tsx
 import { getAuthUser } from "~/services/auth.server";
 import Review from "~/models/Review";
+import { updateBookRating } from "~/utils/updateBookRating";
 import type { Route } from "../../+types/root";
 
 export async function action({ request, params }: Route.ActionArgs) {
@@ -34,12 +35,18 @@ export async function action({ request, params }: Route.ActionArgs) {
       );
     }
 
+    // Store the book ID before updating the review
+    const bookId = review.book.toString();
+
     // Use Mongoose's validate function to trigger validation rules from the model
     review.comment = comment;
     review.rating = rating;
     
     await review.validate(); // This will validate without saving
     await Review.findByIdAndUpdate(reviewId, { comment, rating });
+    
+    // Update the book's overall rating after review update
+    await updateBookRating(bookId);
     
     const updatedReview = await Review.findById(reviewId)
       .populate("user", "name")

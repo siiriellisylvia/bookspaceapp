@@ -1,6 +1,7 @@
 // filepath: c:\Users\siiri\BAU\awu-re-exam-siiriellisylvia\app\routes\reviews\create.tsx
 import { getAuthUser } from "~/services/auth.server";
 import Review from "~/models/Review";
+import { updateBookRating } from "~/utils/updateBookRating";
 import type { Route } from "../../+types/root";
 
 export async function action({ request, params }: Route.ActionArgs) {
@@ -22,6 +23,13 @@ export async function action({ request, params }: Route.ActionArgs) {
       comment,
       rating,
     });
+    
+    // Update the book's overall rating and ratings count
+    if (!params.id) {
+      throw new Response("Book ID is required", { status: 400 });
+    }
+    await updateBookRating(params.id);
+    
     const populatedReview = await Review.findById(newReview._id)
       .populate("user", "name")
       .lean();

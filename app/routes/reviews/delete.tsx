@@ -1,6 +1,7 @@
 // filepath: c:\Users\siiri\BAU\awu-re-exam-siiriellisylvia\app\routes\reviews\delete.tsx
 import { getAuthUser } from "~/services/auth.server";
 import Review from "~/models/Review";
+import { updateBookRating } from "~/utils/updateBookRating";
 import type { Route } from "../../+types/root";
 
 export async function action({ request, params }: Route.ActionArgs) {
@@ -31,7 +32,14 @@ export async function action({ request, params }: Route.ActionArgs) {
       );
     }
 
+    // Store the book ID before deleting the review
+    const bookId = review.book.toString();
+
     await Review.findByIdAndDelete(reviewId);
+    
+    // Update the book's overall rating after review deletion
+    await updateBookRating(bookId);
+    
     return Response.json({ success: true, deleted: true, reviewId });
   } catch (error) {
     console.error("Error deleting review:", error);
