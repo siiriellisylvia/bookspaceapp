@@ -117,8 +117,8 @@ export default function BooksPage({
             <DropdownMenuTrigger asChild>
               <Button variant="outline" className="w-full justify-between">
                 {selectedGenres.length === 0
-                  ? "All Genres"
-                  : `${selectedGenres.length} selected`}
+                  ? "All genres"
+                  : `${selectedGenres.length} genres selected`}
                 <ChevronDown className="h-4 w-4 ml-2" />
               </Button>
             </DropdownMenuTrigger>
@@ -149,8 +149,8 @@ export default function BooksPage({
               onValueChange={(value) => setMinRating(value[0])}
               className="flex-1"
             />
-            <div className="ml-4 flex items-center">
-              <span className="mr-1">{minRating.toFixed(1)}</span>
+            <div className="ml-4 mr-2 flex items-center">
+              <span className="mr-2">{minRating.toFixed(1)}</span>
               <Star className="h-4 w-4 fill-primary-beige" />
             </div>
           </div>
@@ -159,18 +159,18 @@ export default function BooksPage({
         {/* Clear filters button */}
         <div className="flex justify-end w-full">
           <Button
-            variant="outline"
+            variant="link"
             onClick={resetFilters}
             disabled={selectedGenres.length === 0 && minRating === 0 && !search}
           >
-            Clear Filters
+            Clear filters
           </Button>
         </div>
       </div>
 
       {/* Results count */}
       <div className="mb-4">
-        <p className="text-muted-foreground">
+        <p className="text-primary-beige-80 text-center">
           Showing {filteredBooks.length} of {books.length} books
           {selectedGenres.length > 0 &&
             ` in ${selectedGenres.length} selected ${selectedGenres.length === 1 ? "genre" : "genres"}`}
@@ -188,11 +188,11 @@ export default function BooksPage({
           ))
         ) : (
           <div className="w-full text-center py-12">
-            <p className="text-muted-foreground">
+            <p>
               No books match your filters.
             </p>
             <Button variant="outline" className="mt-4" onClick={resetFilters}>
-              Reset Filters
+              Clear filters
             </Button>
           </div>
         )}
