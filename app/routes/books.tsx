@@ -1,4 +1,3 @@
-import { Link, redirect } from "react-router";
 import BookCard from "../components/BookCard";
 import Book, { type BookType } from "../models/Book";
 import { Input } from "~/components/ui/input";
@@ -6,6 +5,7 @@ import type { Route } from "../+types/root";
 import { authenticateUser } from "../services/auth.server";
 import { useSearchParams } from "react-router";
 import { Button } from "~/components/ui/button";
+import { useState } from "react";
 
 export async function loader({ request }: Route.LoaderArgs) {
   await authenticateUser(request);
@@ -46,11 +46,12 @@ export default function BooksPage({
 }) {
   const { books, popularGenres } = loaderData;
   const [searchParams, setSearchParams] = useSearchParams();
+  const [displayCount, setDisplayCount] = useState(15);
 
   const search = searchParams.get("search") || "";
   const selectedGenres = searchParams.getAll("genre"); // Get all selected genres
 
-  // update search params when a genre is toggled
+  // Update search params when a genre is toggled
   const toggleGenre = (genre: string) => {
     const newParams = new URLSearchParams(searchParams);
     const genres = newParams.getAll("genre");
@@ -63,6 +64,15 @@ export default function BooksPage({
 
     setSearchParams(newParams);
   };
+
+  // Function to load more books
+  const handleLoadMore = () => {
+    setDisplayCount(prevCount => prevCount + 15);
+  };
+
+  // Get the books to display based on the current display count
+  const displayedBooks = books.slice(0, displayCount);
+  const hasMoreBooks = displayCount < books.length;
 
   return (
     <section className="flex flex-col mx-auto px-2 py-20 md:px-40 md:py-10">
@@ -96,12 +106,28 @@ export default function BooksPage({
 
       {/* books */}
       <section className="flex flex-wrap justify-center gap-4">
-        {books.length ? (
-          books.map((book) => <BookCard book={book} />)
+        {displayedBooks.length ? (
+          displayedBooks.map((book) => <BookCard key={book._id.toString()} book={book} />)
         ) : (
           <p className="col-span-full text-center">No books found.</p>
         )}
       </section>
+      
+      {/* Load more button */}
+      {hasMoreBooks && (
+        <div className="flex justify-center mt-8">
+          <Button onClick={handleLoadMore} variant="outline" className="px-8">
+            Load more books
+          </Button>
+        </div>
+      )}
+      
+      {/* Book count display */}
+      {books.length > 0 && (
+        <p className="text-center text-primary-beige-80! mt-4">
+          Showing {displayedBooks.length} of {books.length} books
+        </p>
+      )}
     </section>
   );
 }
