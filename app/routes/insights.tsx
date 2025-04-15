@@ -2,7 +2,6 @@ import type { Route } from "../+types/root";
 import { authenticateUser } from "~/services/auth.server";
 import User from "~/models/User";
 import Book from "~/models/Book";
-import { Card } from "~/components/ui/card";
 import { redirect } from "react-router";
 import {
   addDays,
@@ -14,12 +13,12 @@ import {
   subDays,
   subMonths,
   subWeeks,
+  endOfMonth,
+  endOfWeek,
 } from "date-fns";
 import {
-  ReadingGoalChart,
   type ReadingPeriodData,
 } from "~/components/ReadingGoalChart";
-import { TestChart } from "../components/TestChart";
 import {
   Tabs,
   TabsList,
@@ -27,6 +26,9 @@ import {
   TabsContent,
 } from "../components/ui/tabs";
 import { ProgressChart } from "~/components/ProgressChart";
+import { WeeklyInsights } from "~/components/insights/WeeklyInsights";
+import { MonthlyInsights } from "~/components/insights/MonthlyInsights";
+import { AllTimeInsights } from "~/components/insights/AllTimeInsights";
 
 export async function loader({ request }: Route.LoaderArgs) {
   const currentUserId = await authenticateUser(request);
@@ -195,6 +197,56 @@ export async function loader({ request }: Route.LoaderArgs) {
     });
   }
 
+  // Calculate weekly reading stats (Monday-Sunday of current week)
+  const currentWeekStart = startOfWeek(today, { weekStartsOn: 1 }); // Monday as start of week
+  const currentWeekEnd = endOfWeek(today, { weekStartsOn: 1 }); // Sunday as end of week
+  
+  // Calculate weekly minutes read and books read
+  let weeklyMinutesRead = 0;
+  const weeklyReadBooks = new Set();
+  
+  user.bookCollection.forEach(bookEntry => {
+    bookEntry.readingSessions.forEach(session => {
+      if (
+        session.startTime &&
+        isWithinInterval(new Date(session.startTime), { 
+          start: currentWeekStart, 
+          end: currentWeekEnd 
+        })
+      ) {
+        weeklyMinutesRead += (session.minutesRead || 0);
+        if (session.minutesRead && session.minutesRead > 0) {
+          weeklyReadBooks.add(bookEntry.bookId);
+        }
+      }
+    });
+  });
+  
+  // Calculate monthly reading stats (current month)
+  const currentMonthStart = startOfMonth(today);
+  const currentMonthEnd = endOfMonth(today);
+  
+  // Calculate monthly minutes read and books read
+  let monthlyMinutesRead = 0;
+  const monthlyReadBooks = new Set();
+  
+  user.bookCollection.forEach(bookEntry => {
+    bookEntry.readingSessions.forEach(session => {
+      if (
+        session.startTime &&
+        isWithinInterval(new Date(session.startTime), { 
+          start: currentMonthStart, 
+          end: currentMonthEnd 
+        })
+      ) {
+        monthlyMinutesRead += (session.minutesRead || 0);
+        if (session.minutesRead && session.minutesRead > 0) {
+          monthlyReadBooks.add(bookEntry.bookId);
+        }
+      }
+    });
+  });
+
   return Response.json({
     totalMinutesRead,
     totalBooksRead: sortedBooks.length,
@@ -203,6 +255,15 @@ export async function loader({ request }: Route.LoaderArgs) {
     todayMinutesRead,
     dailyGoalMinutes,
     completionPercentage,
+    weeklyMinutesRead,
+    weeklyBooksRead: weeklyReadBooks.size,
+    monthlyMinutesRead,
+    monthlyBooksRead: monthlyReadBooks.size,
+    currentWeek: {
+      start: format(currentWeekStart, "MMM d"),
+      end: format(currentWeekEnd, "MMM d, yyyy")
+    },
+    currentMonth: format(today, "MMMM yyyy")
   });
 }
 
@@ -222,6 +283,15 @@ export default function Insights({
     todayMinutesRead: number;
     dailyGoalMinutes: number;
     completionPercentage: number;
+    weeklyMinutesRead: number;
+    weeklyBooksRead: number;
+    monthlyMinutesRead: number;
+    monthlyBooksRead: number;
+    currentWeek: {
+      start: string;
+      end: string;
+    };
+    currentMonth: string;
   };
 }) {
   const { 
@@ -231,7 +301,13 @@ export default function Insights({
     periodicReadingData,
     todayMinutesRead,
     dailyGoalMinutes,
-    completionPercentage
+    completionPercentage,
+    weeklyMinutesRead,
+    weeklyBooksRead,
+    monthlyMinutesRead,
+    monthlyBooksRead,
+    currentWeek,
+    currentMonth
   } = loaderData;
 
   return (
@@ -251,47 +327,30 @@ export default function Insights({
           <TabsTrigger value="monthly">Monthly</TabsTrigger>
           <TabsTrigger value="all-time">All time</TabsTrigger>
         </TabsList>
-        <TabsContent value="all-time">
-          <div className="grid gap-4 md:grid-cols-2">
-            <Card>
-              <h2 className="text-center mb-1">Total reading time</h2>
-              <p className="text-3xl! font-bold text-center">
-                {totalMinutesRead} minutes
-              </p>
-              <p className="text-center mt-2">
-                That's approximately {Math.round(totalMinutesRead / 60)} hours
-                of reading!
-              </p>
-            </Card>
-
-            <Card className="p-6">
-              <h2 className="text-center mb-2">Books read</h2>
-              <p className="text-3xl! font-bold text-center">
-                {totalBooksRead}
-              </p>
-              <p className="text-center mt-2">
-                Keep going to expand your reading journey!
-              </p>
-            </Card>
-          </div>
-
-          {readingGoal &&
-            readingGoal.isActive &&
-            (readingGoal.type === "minutes" || readingGoal.type === "hours") &&
-            periodicReadingData.length > 0 && (
-              <Card>
-                <h2 className="mb-4 text-center">
-                  Reading goal progress
-                </h2>
-                <p className="text-center mb-4">
-                  Your goal: {readingGoal.target} {readingGoal.type}{" "}
-                  {readingGoal.frequency}
-                </p>
-                <ReadingGoalChart data={periodicReadingData} />
-              </Card>
-            )}
+        <TabsContent value="weekly">
+          <WeeklyInsights 
+            weeklyMinutesRead={weeklyMinutesRead}
+            weeklyBooksRead={weeklyBooksRead}
+            readingGoal={readingGoal}
+            currentWeek={currentWeek}
+          />
         </TabsContent>
-        <TabsContent value="monthly">Change your password here.</TabsContent>
+        <TabsContent value="monthly">
+          <MonthlyInsights 
+            monthlyMinutesRead={monthlyMinutesRead}
+            monthlyBooksRead={monthlyBooksRead}
+            readingGoal={readingGoal}
+            currentMonth={currentMonth}
+          />
+        </TabsContent>
+        <TabsContent value="all-time">
+          <AllTimeInsights 
+            totalMinutesRead={totalMinutesRead}
+            totalBooksRead={totalBooksRead}
+            readingGoal={readingGoal}
+            periodicReadingData={periodicReadingData}
+          />
+        </TabsContent>
       </Tabs>
     </div>
   );
