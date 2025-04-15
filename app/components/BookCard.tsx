@@ -13,14 +13,14 @@ export default function BookCard({
 
 
   return (
-    <Link to={`/books/${book._id}`}>
-    <div className="flex flex-col w-30 lg:w-48 text-wrap">
+    <Link to={`/books/${book._id}`} className="flex justify-center">
+    <div className="flex flex-col w-24 sm:w-28 md:w-36 lg:w-40 text-wrap">
       <img
         src={
           book.coverImage?.url ||
           "https://images.unsplash.com/photo-1543002588-bfa74002ed7e?q=80&w=2730&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"
         }
-        className=" w-30 lg:w-48 h-45 lg:h-72 object-cover rounded-sm shadow-md"
+        className="w-full h-36 sm:h-40 md:h-48 lg:h-60 object-cover rounded-sm shadow-md"
         alt={book.title}
       />
       {progress !== undefined && (
@@ -33,7 +33,7 @@ export default function BookCard({
           </div>
         </div>
       )}
-      <p>{book.title}</p>
+      <p className="text-xs sm:text-sm md:text-base break-words">{book.title}</p>
     </div>
     </Link>
   );

@@ -178,14 +178,16 @@ export default function BooksPage({
 
       {/* Genre quick filter buttons */}
 
-      {/* Book grid */}
-      <section className="grid grid-cols-3 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-2">
+      {/* Book grid - centered with consistent spacing and larger vertical gap */}
+      <div className="flex flex-wrap justify-center gap-x-4 gap-y-4 mx-auto">
         {filteredBooks.length ? (
           filteredBooks.map((book) => (
-            <BookCard key={book._id.toString()} book={book} />
+            <div key={book._id.toString()} className="flex justify-center">
+              <BookCard book={book} />
+            </div>
           ))
         ) : (
-          <div className="col-span-full text-center py-12">
+          <div className="w-full text-center py-12">
             <p className="text-muted-foreground">
               No books match your filters.
             </p>
@@ -194,7 +196,7 @@ export default function BooksPage({
             </Button>
           </div>
         )}
-      </section>
+      </div>
       {/* Load more button */}
       {hasMoreBooks && (
         <div className="flex justify-center mt-8">
