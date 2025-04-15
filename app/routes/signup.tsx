@@ -1,4 +1,4 @@
-import { Form, Link, redirect } from "react-router";
+import { Form, Link, redirect, useActionData } from "react-router";
 import type { Route } from "../+types/root";
 import User from "../models/User";
 import { Input } from "~/components/ui/input";
@@ -7,6 +7,11 @@ import { Label } from "~/components/ui/label";
 import logo from "../assets/logo-beige.svg";
 
 export default function SignUp() {
+  const actionData = useActionData<{
+    errors?: { name?: string; email?: string; password?: string };
+    error?: string;
+  }>();
+
   return (
     <div
       id="sign-up-page"
@@ -17,6 +22,13 @@ export default function SignUp() {
       </div>
       <div className="w-full max-w-md p-8">
         <h1 className="text-center mb-6">Sign up</h1>
+
+        {actionData?.error && (
+          <div className="bg-primary-destructive/20 text-white p-3 rounded-md mb-4">
+            {actionData.error}
+          </div>
+        )}
+
         <Form id="sign-up-form" method="post" className="space-y-4">
           <div className="flex flex-col gap-2">
             <Label htmlFor="name">Name</Label>
@@ -26,8 +38,15 @@ export default function SignUp() {
               name="name"
               aria-label="name"
               placeholder="Type your name..."
-              required
-            ></Input>
+              aria-invalid={actionData?.errors?.name ? "true" : undefined}
+            />
+            {actionData?.errors?.name && (
+              <p className="text-primary-destructive! text-xs">
+                {actionData.errors.name}
+              </p>
+            )}
+          </div>
+          <div className="flex flex-col gap-2">
             <Label htmlFor="email">Email</Label>
             <Input
               id="email"
@@ -35,11 +54,16 @@ export default function SignUp() {
               name="email"
               aria-label="email"
               placeholder="Type your email..."
-              required
-            ></Input>
+              aria-invalid={actionData?.errors?.email ? "true" : undefined}
+            />
+            {actionData?.errors?.email && (
+              <p className="text-primary-destructive! text-xs">
+                {actionData.errors.email}
+              </p>
+            )}
           </div>
 
-          <div className="flex flex-col">
+          <div className="flex flex-col gap-2">
             <Label htmlFor="password">Password</Label>
             <Input
               id="password"
@@ -48,11 +72,16 @@ export default function SignUp() {
               aria-label="password"
               placeholder="Type your password..."
               autoComplete="current-password"
-              required
+              aria-invalid={actionData?.errors?.password ? "true" : undefined}
             />
+            {actionData?.errors?.password && (
+              <p className="text-primary-destructive! text-xs">
+                {actionData.errors.password}
+              </p>
+            )}
           </div>
 
-          <Button className="w-full cursor-pointer" type="submit">
+          <Button className="w-full cursor-pointer mt-4" type="submit">
             Sign up
           </Button>
         </Form>
@@ -70,19 +99,53 @@ export default function SignUp() {
 export async function action({ request }: Route.ActionArgs) {
   try {
     const formData = await request.formData();
-    console.log(formData);
-    const newUser = Object.fromEntries(formData);
+
+    // Simple validation
+    const errors: { name?: string; email?: string; password?: string } = {};
+
+    const name = formData.get("name");
+    const email = formData.get("email");
+    const password = formData.get("password");
+
+    if (!name) errors.name = "Name is required";
+    if (!email) errors.email = "Email is required";
+    if (!password) errors.password = "Password is required";
+
+    // Return errors if any required fields are missing
+    if (Object.keys(errors).length > 0) {
+      return { errors };
+    }
+
+    // Check if email already exists
+    const existingUser = await User.findOne({ email });
+    if (existingUser) {
+      return {
+        errors: {
+          email: "This email is already registered",
+        },
+      };
+    }
+
+    // Create new user with validated data
+    const newUser = {
+      name,
+      email,
+      password,
+    };
 
     const result = await User.create(newUser);
     if (!result) {
-      // Return a Response with error, or throw an error
-      return { error: "User not created" };
+      return { error: "Failed to create account. Please try again." };
     }
 
-    return redirect("/");
+    return redirect("/signin");
   } catch (error) {
-    if (error instanceof Error) {
-      return { error: error.message };
-    }
+    console.error("Signup error:", error);
+    return {
+      error:
+        error instanceof Error
+          ? error.message
+          : "An unexpected error occurred. Please try again.",
+    };
   }
 }
