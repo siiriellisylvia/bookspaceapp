@@ -5,13 +5,17 @@ import type { Route } from "./+types/signin";
 import { sessionStorage } from "~/services/session.server";
 import { Input } from "~/components/ui/input";
 import { Button } from "~/components/ui/button";
+import logo from "../assets/logo-beige.svg";
 
 export default function SignIn() {
   return (
     <div
       id="sign-in-page"
-      className="flex min-h-screen items-center justify-center px-4"
+      className="flex flex-col min-h-screen items-center justify-center px-4"
     >
+      <div className="absolute left-4 top-8">
+        <img src={logo} alt="Book Space logo" className="w-32" />
+      </div>
       <div className="w-full max-w-md p-8">
         <h1 className="text-center mb-6">Sign In</h1>
         <Form id="sign-in-form" method="post" className="space-y-4">

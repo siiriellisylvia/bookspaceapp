@@ -4,6 +4,7 @@ import User from "../models/User";
 import { Input } from "~/components/ui/input";
 import { Button } from "~/components/ui/button";
 import { Label } from "~/components/ui/label";
+import logo from "../assets/logo-beige.svg";
 
 export default function SignUp() {
   return (
@@ -11,6 +12,9 @@ export default function SignUp() {
       id="sign-up-page"
       className="flex min-h-screen items-center justify-center px-4"
     >
+      <div className="absolute left-4 top-8">
+        <img src={logo} alt="Book Space logo" className="w-32" />
+      </div>
       <div className="w-full max-w-md p-8">
         <h1 className="text-center mb-6">Sign up</h1>
         <Form id="sign-up-form" method="post" className="space-y-4">
