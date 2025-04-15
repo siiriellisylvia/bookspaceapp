@@ -1,4 +1,4 @@
-import logo from "../assets/logo-beige.svg";
+import logo from "../assets/bookspace-beige.png";
 import { Link, redirect } from "react-router";
 import { Button } from "~/components/ui/button";
 import books from "../assets/signup-image.png";

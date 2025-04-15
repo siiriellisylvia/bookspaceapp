@@ -4,7 +4,7 @@ import User from "../models/User";
 import { Input } from "~/components/ui/input";
 import { Button } from "~/components/ui/button";
 import { Label } from "~/components/ui/label";
-import logo from "../assets/logo-beige.svg";
+import logo from "../assets/bookspace-beige.png";
 
 export default function SignUp() {
   const actionData = useActionData<{

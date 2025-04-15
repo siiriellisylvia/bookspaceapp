@@ -5,7 +5,7 @@ import type { Route } from "./+types/signin";
 import { sessionStorage } from "~/services/session.server";
 import { Input } from "~/components/ui/input";
 import { Button } from "~/components/ui/button";
-import logo from "../assets/logo-beige.svg";
+import logo from "../assets/bookspace-beige.png";
 import { Label } from "../components/ui/label";
 
 
