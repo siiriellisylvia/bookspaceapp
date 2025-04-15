@@ -43,19 +43,26 @@ export async function loader({ request }: Route.LoaderArgs) {
     throw new Response("User not found", { status: 404 });
   }
 
-  // Calculate total reading minutes
+  // Calculate total reading minutes and pages
   let totalMinutesRead = 0;
+  let totalPagesRead = 0;
 
   // Track reading minutes per book
   const booksReadingData = await Promise.all(
     user.bookCollection.map(async (bookEntry) => {
-      // Sum minutes for each book
+      // Sum minutes and pages for each book
       const bookMinutes = bookEntry.readingSessions.reduce(
         (total, session) => total + (session.minutesRead || 0),
         0,
       );
 
+      const bookPages = bookEntry.readingSessions.reduce(
+        (total, session) => total + (session.pagesRead || 0),
+        0,
+      );
+
       totalMinutesRead += bookMinutes;
+      totalPagesRead += bookPages;
 
       // Fetch book details
       const book = await Book.findById(bookEntry.bookId);
@@ -65,6 +72,7 @@ export async function loader({ request }: Route.LoaderArgs) {
         title: book ? book.title : "Unknown Book",
         author: book ? book.author.join(", ") : "Unknown Author",
         minutes: bookMinutes,
+        pages: bookPages,
         coverImage: book?.coverImage?.url,
       };
     }),
@@ -113,8 +121,8 @@ export async function loader({ request }: Route.LoaderArgs) {
       readingGoal.type === "hours"
         ? readingGoal.target * 60
         : readingGoal.type === "minutes"
-          ? readingGoal.target
-          : 0;
+        ? readingGoal.target
+        : 0;
 
     // Adjust goal based on frequency
     if (readingGoal.frequency === "weekly") {
@@ -207,8 +215,9 @@ export async function loader({ request }: Route.LoaderArgs) {
   const currentWeekStart = startOfWeek(today, { weekStartsOn: 1 }); // Monday as start of week
   const currentWeekEnd = endOfWeek(today, { weekStartsOn: 1 }); // Sunday as end of week
 
-  // Calculate weekly minutes read and books read
+  // Calculate weekly minutes read, pages read, and books read
   let weeklyMinutesRead = 0;
+  let weeklyPagesRead = 0;
   const weeklyReadBooks = new Set();
 
   user.bookCollection.forEach((bookEntry) => {
@@ -221,6 +230,7 @@ export async function loader({ request }: Route.LoaderArgs) {
         })
       ) {
         weeklyMinutesRead += session.minutesRead || 0;
+        weeklyPagesRead += session.pagesRead || 0;
         if (session.minutesRead && session.minutesRead > 0) {
           weeklyReadBooks.add(bookEntry.bookId);
         }
@@ -232,8 +242,9 @@ export async function loader({ request }: Route.LoaderArgs) {
   const currentMonthStart = startOfMonth(today);
   const currentMonthEnd = endOfMonth(today);
 
-  // Calculate monthly minutes read and books read
+  // Calculate monthly minutes read, pages read, and books read
   let monthlyMinutesRead = 0;
+  let monthlyPagesRead = 0;
   const monthlyReadBooks = new Set();
 
   user.bookCollection.forEach((bookEntry) => {
@@ -246,6 +257,7 @@ export async function loader({ request }: Route.LoaderArgs) {
         })
       ) {
         monthlyMinutesRead += session.minutesRead || 0;
+        monthlyPagesRead += session.pagesRead || 0;
         if (session.minutesRead && session.minutesRead > 0) {
           monthlyReadBooks.add(bookEntry.bookId);
         }
@@ -263,8 +275,8 @@ export async function loader({ request }: Route.LoaderArgs) {
       readingGoal.type === "hours"
         ? readingGoal.target * 60
         : readingGoal.type === "minutes"
-          ? readingGoal.target
-          : 0;
+        ? readingGoal.target
+        : 0;
 
     // Set the target minutes based on frequency without dividing
     periodGoalMinutes = rawGoalMinutes;
@@ -290,6 +302,7 @@ export async function loader({ request }: Route.LoaderArgs) {
 
   return Response.json({
     totalMinutesRead,
+    totalPagesRead,
     totalBooksRead: sortedBooks.length,
     readingGoal,
     periodicReadingData,
@@ -300,8 +313,10 @@ export async function loader({ request }: Route.LoaderArgs) {
     periodGoalMinutes,
     periodCompletionPercentage,
     weeklyMinutesRead,
+    weeklyPagesRead,
     weeklyBooksRead: weeklyReadBooks.size,
     monthlyMinutesRead,
+    monthlyPagesRead,
     monthlyBooksRead: monthlyReadBooks.size,
     currentWeek: {
       start: format(currentWeekStart, "MMM d"),
@@ -316,6 +331,7 @@ export default function Insights({
 }: {
   loaderData: {
     totalMinutesRead: number;
+    totalPagesRead: number;
     totalBooksRead: number;
     readingGoal: {
       type: string;
@@ -331,8 +347,10 @@ export default function Insights({
     periodGoalMinutes: number;
     periodCompletionPercentage: number;
     weeklyMinutesRead: number;
+    weeklyPagesRead: number;
     weeklyBooksRead: number;
     monthlyMinutesRead: number;
+    monthlyPagesRead: number;
     monthlyBooksRead: number;
     currentWeek: {
       start: string;
@@ -343,6 +361,7 @@ export default function Insights({
 }) {
   const {
     totalMinutesRead,
+    totalPagesRead,
     totalBooksRead,
     readingGoal,
     periodicReadingData,
@@ -350,8 +369,10 @@ export default function Insights({
     periodGoalMinutes,
     periodCompletionPercentage,
     weeklyMinutesRead,
+    weeklyPagesRead,
     weeklyBooksRead,
     monthlyMinutesRead,
+    monthlyPagesRead,
     monthlyBooksRead,
     currentWeek,
     currentMonth,
@@ -398,6 +419,7 @@ export default function Insights({
           <TabsContent value="weekly" className="mt-4">
             <WeeklyInsights
               weeklyMinutesRead={weeklyMinutesRead}
+              weeklyPagesRead={weeklyPagesRead}
               weeklyBooksRead={weeklyBooksRead}
               readingGoal={readingGoal}
               currentWeek={currentWeek}
@@ -406,6 +428,7 @@ export default function Insights({
           <TabsContent value="monthly" className="mt-4">
             <MonthlyInsights
               monthlyMinutesRead={monthlyMinutesRead}
+              monthlyPagesRead={monthlyPagesRead}
               monthlyBooksRead={monthlyBooksRead}
               readingGoal={readingGoal}
               currentMonth={currentMonth}
@@ -414,6 +437,7 @@ export default function Insights({
           <TabsContent value="all-time" className="mt-4">
             <AllTimeInsights
               totalMinutesRead={totalMinutesRead}
+              totalPagesRead={totalPagesRead}
               totalBooksRead={totalBooksRead}
               readingGoal={readingGoal}
               periodicReadingData={periodicReadingData}
