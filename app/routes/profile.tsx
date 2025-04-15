@@ -108,24 +108,23 @@ export default function ProfilePage({
         {showReadingGoal()}
       </div>
 
-      {/* Navigation links replacing accordion */}
       <div className="w-full max-w-md">
-        <Link to="/saved-books" className="w-full">
-          <div className="flex items-center justify-between py-3">
-            <div className="flex items-center gap-2 font-sans text-sm">
-              <FaBookmark className="text-primary-beige" />
-              <span>Saved Books</span>
-            </div>
-            <FaChevronRight className="text-sm text-gray-400" />
-          </div>
-        </Link>
-        <Separator />
-
         <Link to="/my-books" className="w-full">
           <div className="flex items-center justify-between py-3">
             <div className="flex items-center gap-2 font-sans text-sm">
               <FaBook className="text-primary-beige" />
-              <span>My Books</span>
+              <span>My books</span>
+            </div>
+            <FaChevronRight className="text-sm text-primary-beige" />
+          </div>
+        </Link>
+        <Separator />
+
+        <Link to="/my-bookmarks" className="w-full">
+          <div className="flex items-center justify-between py-3">
+            <div className="flex items-center gap-2 font-sans text-sm">
+              <FaBookmark className="text-primary-beige" />
+              <span>My bookmarks</span>
             </div>
             <FaChevronRight className="text-sm text-primary-beige" />
           </div>
@@ -136,7 +135,7 @@ export default function ProfilePage({
           <div className="flex items-center justify-between py-3">
             <div className="flex items-center gap-2 font-sans text-sm">
               <FaStar className="text-primary-beige" />
-              <span>My Reviews</span>
+              <span>My reviews</span>
             </div>
             <FaChevronRight className="text-sm text-primary-beige" />
           </div>
@@ -146,7 +145,7 @@ export default function ProfilePage({
 
       <Form method="post" className="mt-6 mb-8">
         <input type="hidden" name="_action" value="logout" />
-        <Button type="submit">Log Out</Button>
+        <Button type="submit">Log out</Button>
       </Form>
 
       <AlertDialog
@@ -157,8 +156,7 @@ export default function ProfilePage({
           <AlertDialogHeader>
             <AlertDialogTitle>Delete reading goal</AlertDialogTitle>
             <AlertDialogDescription>
-              Are you sure you want to delete your reading goal? This action
-              cannot be undone.
+              Are you sure you want to delete your reading goal? There is no going back!
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
