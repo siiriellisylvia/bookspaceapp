@@ -28,7 +28,7 @@ export function WeeklyInsights({
       <h3 className="text-center mb-2 font-sans!">{currentWeek.start} - {currentWeek.end}</h3>
       <div className="grid grid-cols-2 gap-4">
         <Card className="p-4">
-          <h4 className="text-center font-sans!">Minutes read this week</h4>
+          <h4 className="text-center font-sans!">Minutes read</h4>
           <p className="text-3xl! font-bold text-center mt-0">
             {weeklyMinutesRead}
           </p>
@@ -39,7 +39,7 @@ export function WeeklyInsights({
         </Card>
 
         <Card className="p-4">
-          <h4 className="text-center font-sans!">Books read this week</h4>
+          <h4 className="text-center font-sans!">Books read</h4>
           <p className="text-3xl! font-bold text-center mt-0">
             {weeklyBooksRead}
           </p>
@@ -53,7 +53,7 @@ export function WeeklyInsights({
         </Card>
         
         <Card className="p-4">
-          <h4 className="text-center font-sans!">Pages read this week</h4>
+          <h4 className="text-center font-sans!">Pages read</h4>
           <p className="text-3xl! font-bold text-center mt-0">
             {weeklyPagesRead}
           </p>

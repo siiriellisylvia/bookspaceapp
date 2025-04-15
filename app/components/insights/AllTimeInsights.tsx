@@ -25,7 +25,7 @@ export function AllTimeInsights({
     <>
       <div className="grid grid-cols-2 gap-4">
         <Card className="p-4">
-          <h4 className="text-center font-sans!">Minutes read all time</h4>
+          <h4 className="text-center font-sans!">Minutes read</h4>
           <p className="text-3xl! font-bold text-center mt-0">
             {totalMinutesRead}
           </p>
@@ -36,7 +36,7 @@ export function AllTimeInsights({
         </Card>
 
         <Card className="p-4">
-          <h4 className="text-center font-sans!">Books read all time</h4>
+          <h4 className="text-center font-sans!">Books read</h4>
           <p className="text-3xl! font-bold text-center mt-0">
             {totalBooksRead}
           </p>
@@ -46,7 +46,7 @@ export function AllTimeInsights({
         </Card>
         
         <Card className="p-4">
-          <h4 className="text-center font-sans!">Pages read all time</h4>
+          <h4 className="text-center font-sans!">Pages read</h4>
           <p className="text-3xl! font-bold text-center mt-0">
             {totalPagesRead}
           </p>
