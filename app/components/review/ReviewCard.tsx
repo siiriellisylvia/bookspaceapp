@@ -1,7 +1,7 @@
 import { Card, CardContent } from "~/components/ui/card";
-import { AiFillStar } from "react-icons/ai";
 import { Button } from "~/components/ui/button";
 import { PencilLine } from "lucide-react";
+import { renderStars } from "~/utils/renderStars";
 
 export default function ReviewCard({
   review,
@@ -37,10 +37,7 @@ export default function ReviewCard({
               <span className="text-xs text-primary-burgundy dark:text-primary-beige-80">{formattedDate}</span>
             </div>
             <div className="flex gap-2 text-primary-burgundy dark:text-primary-beige">
-              {/* Create an array with length equal to review.rating and map over it */}
-              {[...Array(review.rating)].map((_, i) => (
-                <AiFillStar key={i} size={20} />
-              ))}
+              {renderStars(review.rating)}
             </div>
           </div>
         </div>

@@ -2,7 +2,8 @@ import { useState, useRef, useEffect } from "react";
 import { useFetcher } from "react-router";
 import { Card, CardContent } from "~/components/ui/card";
 import { Button } from "~/components/ui/button";
-import { AiFillStar, AiOutlineStar } from "react-icons/ai";
+import { AiFillStar } from "react-icons/ai";
+import { renderStars } from "~/utils/renderStars";
 
 export default function CreateReviewCard({
   bookId,
@@ -65,7 +66,7 @@ export default function CreateReviewCard({
           </label>
 
           {generalError && (
-            <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-2 rounded-md mt-2">
+            <div className="bg-red-100 border border-primary-destructive text-white px-4 py-2 rounded-md mt-2">
               {generalError}
             </div>
           )}
@@ -76,18 +77,18 @@ export default function CreateReviewCard({
                 key={num}
                 type="button"
                 onClick={() => setRating(num)}
-                className=" text-primary-burgundy dark:text-primary-beige"
+                className={`${
+                  rating !== null && num <= rating
+                    ? "text-primary-burgundy dark:text-primary-beige" 
+                    : "text-primary-beige-20 dark:text-primary-beige-20"
+                }`}
               >
-                {rating !== null && num <= rating ? (
-                  <AiFillStar size={20} />
-                ) : (
-                  <AiOutlineStar size={20} />
-                )}
+                <AiFillStar size={20} />
               </button>
             ))}
           </div>
           {(errors.rating || rating === null && fetcher.data?.errors) && (
-            <p className="text-red-500 text-xs mt-1 text-right">
+            <p className="text-primary-destructive text-xs mt-1 text-right">
               {formatErrorMessage(errors.rating || "Rating between 1-5 is required")}
             </p>
           )}
@@ -98,11 +99,11 @@ export default function CreateReviewCard({
             value={comment}
             onChange={(e) => setComment(e.target.value)}
             className={`w-full border p-2 rounded-md mt-2 text-primary-burgundy dark:text-primary-beige ${
-              errors.comment ? "border-red-500" : ""
+              errors.comment ? "border-primary-destructive" : ""
             }`}
           />
           {errors.comment && (
-            <p className="text-red-500 text-xs mt-1">{errors.comment}</p>
+            <p className="text-primary-destructive text-xs mt-1">{errors.comment}</p>
           )}
 
           <input type="hidden" name="rating" value={rating || ""} />

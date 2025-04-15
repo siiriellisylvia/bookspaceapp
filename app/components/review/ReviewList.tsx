@@ -42,7 +42,7 @@ export default function ReviewList({
                 }}
               />
             ) : (
-              <Button onClick={() => setIsCreatingReview(true)}>
+              <Button className="mb-4" onClick={() => setIsCreatingReview(true)}>
                 Write a review
               </Button>
             )}

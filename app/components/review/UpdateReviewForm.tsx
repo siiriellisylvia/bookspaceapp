@@ -1,7 +1,7 @@
 import { useFetcher } from "react-router";
 import { useState, useEffect, useRef } from "react";
 import { Card, CardContent } from "~/components/ui/card";
-import { AiFillStar, AiOutlineStar } from "react-icons/ai";
+import { AiFillStar } from "react-icons/ai";
 import { Button } from "~/components/ui/button";
 import {
   AlertDialog,
@@ -140,13 +140,13 @@ export default function UpdateReviewForm({
                 key={num}
                 type="button"
                 onClick={() => setEditContent({ ...editContent, rating: num })}
-                className=" text-primary-burgundy dark:text-primary-beige"
+                className={`${
+                  num <= editContent.rating 
+                    ? "text-primary-burgundy dark:text-primary-beige" 
+                    : "text-primary-beige-20 dark:text-primary-beige-20"
+                }`}
               >
-                {num <= editContent.rating ? (
-                  <AiFillStar size={20} />
-                ) : (
-                  <AiOutlineStar size={20} />
-                )}
+                <AiFillStar size={20} />
               </button>
             ))}
           </div>
@@ -163,11 +163,11 @@ export default function UpdateReviewForm({
               setEditContent({ ...editContent, comment: e.target.value })
             }
             className={`w-full border p-2 rounded-md mt-4 text-primary-beige ${
-              errors.comment ? "border-red-500" : ""
+              errors.comment ? "border-primary-destructive" : ""
             }`}
           />
           {errors.comment && (
-            <p className="text-red-500 text-xs mt-1">{errors.comment}</p>
+            <p className="text-xs mt-1">{errors.comment}</p>
           )}
 
           <div className="flex flex-col justify-end gap-2 mt-4">
