@@ -111,7 +111,7 @@ export default function Home({
         }}
       >
         <CardContent className="flex justify-end items-center h-full">
-          <h2 className="w-1/3 md:w/2 text-2xl! text-primary-burgundy!">
+          <h2 className="w-1/2 md:w-1/5 text-2xl! font-bold text-primary-burgundy! p-4">
             Spring favourites
           </h2>
         </CardContent>

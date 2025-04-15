@@ -93,7 +93,7 @@ export default function BooksPage({
     <section className="flex flex-col mx-auto px-2 py-20 md:px-40 md:py-10">
       {/* Filter controls - full width in flex-col */}
       <div className="flex flex-col w-full space-y-4 mb-6">
-        <h1>Books</h1>
+        <h1 className="text-center">Books</h1>
 
         {/* Search - full width */}
         <div className="w-full relative">
