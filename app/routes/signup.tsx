@@ -1,16 +1,19 @@
-import { Form, Link, redirect, useActionData } from "react-router";
+import { Form, Link, redirect, useActionData, useNavigation } from "react-router";
 import type { Route } from "../+types/root";
 import User from "../models/User";
 import { Input } from "~/components/ui/input";
 import { Button } from "~/components/ui/button";
 import { Label } from "~/components/ui/label";
 import logo from "../assets/bookspace-beige.png";
+import { LoaderCircle } from "lucide-react";
 
 export default function SignUp() {
   const actionData = useActionData<{
     errors?: { name?: string; email?: string; password?: string };
     error?: string;
   }>();
+  const navigation = useNavigation();
+  const isSubmitting = navigation.state === "submitting";
 
   return (
     <div
@@ -81,8 +84,8 @@ export default function SignUp() {
             )}
           </div>
 
-          <Button className="w-full cursor-pointer mt-4" type="submit">
-            Sign up
+          <Button className="w-full cursor-pointer mt-4" type="submit" disabled={isSubmitting}>
+            {isSubmitting ? <LoaderCircle className="animate-spin" /> : "Sign up"}
           </Button>
         </Form>
         <p className="mt-4">

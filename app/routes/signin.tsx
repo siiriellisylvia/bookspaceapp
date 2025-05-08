@@ -1,4 +1,4 @@
-import { Form, Link, useActionData } from "react-router";
+import { Form, Link, useActionData, useNavigation } from "react-router";
 import { redirect } from "react-router";
 import { authenticator } from "~/services/auth.server";
 import type { Route } from "./+types/signin";
@@ -7,13 +7,15 @@ import { Input } from "~/components/ui/input";
 import { Button } from "~/components/ui/button";
 import logo from "../assets/bookspace-beige.png";
 import { Label } from "../components/ui/label";
-
+import { LoaderCircle } from "lucide-react";
 
 export default function SignIn() {
   const actionData = useActionData<{
     errors?: { email?: string; password?: string };
     error?: string;
   }>();
+  const navigation = useNavigation();
+  const isSubmitting = navigation.state === "submitting";
 
   return (
     <div
@@ -65,8 +67,8 @@ export default function SignIn() {
             )}
           </div>
 
-          <Button className="w-full cursor-pointer" type="submit">
-            Sign in
+          <Button className="w-full cursor-pointer" type="submit" disabled={isSubmitting}>
+            {isSubmitting ? <LoaderCircle className="animate-spin" /> : "Sign in"}
           </Button>
 
           <p className="mt-4">
